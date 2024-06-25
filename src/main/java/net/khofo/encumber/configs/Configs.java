@@ -13,8 +13,8 @@ public class Configs {
     public static final ForgeConfigSpec.ConfigValue<Double> RIDING_THRESHOLD;
     public static final ForgeConfigSpec.ConfigValue<Double> FALL_FLYING_THRESHOLD;
     public static final ForgeConfigSpec.ConfigValue<Double> JUMPING_THRESHOLD;
-    public static final ForgeConfigSpec.ConfigValue<Double> SLOWNESS_1_THRESHOLD;
-    public static final ForgeConfigSpec.ConfigValue<Double> SLOWNESS_2_THRESHOLD;
+    //public static final ForgeConfigSpec.ConfigValue<Double> SLOWNESS_1_THRESHOLD;
+    public static final ForgeConfigSpec.ConfigValue<Double> SLOWNESS_3_THRESHOLD;
     public static final ForgeConfigSpec.ConfigValue<Double> SLOWNESS_5_THRESHOLD;
 
     static {
@@ -35,19 +35,19 @@ public class Configs {
                         0.5D, 0.5D, 0.5D, 0.5D, 0.5D, 0.5D, 0.5D, 0.5D));
 
         RIDING_THRESHOLD = BUILDER.comment("If weight is above this, you cannot ride a mount (set to negative value to disable)")
-                .define("riding_threshold", 320.0D);
+                .define("riding_threshold", 1280.0D);
 
         FALL_FLYING_THRESHOLD = BUILDER.comment("If weight is above this, you cannot fly with an elytra (set to negative value to disable)")
                 .define("fall_flying_threshold", 128.0D);
 
         JUMPING_THRESHOLD = BUILDER.comment("If weight is above this, you cannot jump (set to negative value to disable)")
-                .define("jumping_threshold", 400.0D);
+                .define("jumping_threshold", 1280.0D);
 
-        SLOWNESS_1_THRESHOLD = BUILDER.comment("If weight is above this, you get slowness 1 (set to negative value to disable)")
-                .define("slowness_1_threshold", 320.0D);
+        //SLOWNESS_1_THRESHOLD = BUILDER.comment("If weight is above this, you get slowness 1 (set to negative value to disable)")
+                //.define("slowness_1_threshold", 320.0D);
 
-        SLOWNESS_2_THRESHOLD = BUILDER.comment("If weight is above this, you get slowness 2 (doesn't stack with slowness 1) (set to negative value to disable)")
-                .define("slowness_2_threshold", 640.0D);
+        SLOWNESS_3_THRESHOLD = BUILDER.comment("If weight is above this, you get slowness 3 (doesn't stack with slowness 1) (set to negative value to disable)")
+                .define("slowness_3_threshold", 640.0D);
 
         SLOWNESS_5_THRESHOLD = BUILDER.comment("If weight is above this, you get slowness 5 (doesn't stack with slowness 1) (set to negative value to disable)")
                 .define("slowness_5_threshold", 1280.0D);

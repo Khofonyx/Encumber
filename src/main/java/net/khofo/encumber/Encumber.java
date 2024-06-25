@@ -6,6 +6,7 @@ import com.google.gson.reflect.TypeToken;
 import com.mojang.logging.LogUtils;
 import net.khofo.encumber.configs.Configs;
 import net.khofo.encumber.events.WeightEvent;
+import net.khofo.encumber.overlays.WeightOverlay;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.MinecraftForge;
@@ -48,7 +49,6 @@ public class Encumber {
         MinecraftForge.EVENT_BUS.register(new WeightEvent());
         modEventBus.addListener(this::commonSetup);
         MinecraftForge.EVENT_BUS.register(this);
-        modEventBus.addListener(this::addCreative);
 
         // Register the config
         ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, Configs.SPEC, "encumber-common.toml");
@@ -98,9 +98,7 @@ public class Encumber {
                 System.err.println("Default item_weights.json not found in resources");
                 return;
             }
-
-            Files.createDirectories(configPath.getParent()); // Ensure the config directory exists
-
+            Files.createDirectories(configPath.getParent());
             try (OutputStream outputStream = Files.newOutputStream(configPath)) {
                 byte[] buffer = new byte[1024];
                 int length;
@@ -120,15 +118,6 @@ public class Encumber {
         return itemWeights.getOrDefault(item, 1.0); // Default weight if not found
     }
 
-    // Add the example block item to the building blocks tab
-    private void addCreative(BuildCreativeModeTabContentsEvent event) {
-    }
-
-    // You can use SubscribeEvent and let the Event Bus discover methods to call
-    @SubscribeEvent
-    public void onServerStarting(ServerStartingEvent event)
-    {
-    }
 
     // You can use EventBusSubscriber to automatically register all static methods in the class annotated with @SubscribeEvent
     @Mod.EventBusSubscriber(modid = MOD_ID, bus = Mod.EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
@@ -137,6 +126,7 @@ public class Encumber {
         @SubscribeEvent
         public static void onClientSetup(FMLClientSetupEvent event)
         {
+            MinecraftForge.EVENT_BUS.register(WeightOverlay.class);
         }
     }
 }
