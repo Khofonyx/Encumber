@@ -13,7 +13,6 @@ public class Configs {
     public static final ForgeConfigSpec.ConfigValue<Double> RIDING_THRESHOLD;
     public static final ForgeConfigSpec.ConfigValue<Double> FALL_FLYING_THRESHOLD;
     public static final ForgeConfigSpec.ConfigValue<Double> JUMPING_THRESHOLD;
-    //public static final ForgeConfigSpec.ConfigValue<Double> SLOWNESS_1_THRESHOLD;
     public static final ForgeConfigSpec.ConfigValue<Double> SLOWNESS_3_THRESHOLD;
     public static final ForgeConfigSpec.ConfigValue<Double> SLOWNESS_5_THRESHOLD;
 
@@ -42,9 +41,6 @@ public class Configs {
 
         JUMPING_THRESHOLD = BUILDER.comment("If weight is above this, you cannot jump (set to negative value to disable)")
                 .define("jumping_threshold", 1280.0D);
-
-        //SLOWNESS_1_THRESHOLD = BUILDER.comment("If weight is above this, you get slowness 1 (set to negative value to disable)")
-                //.define("slowness_1_threshold", 320.0D);
 
         SLOWNESS_3_THRESHOLD = BUILDER.comment("If weight is above this, you get slowness 3 (doesn't stack with slowness 1) (set to negative value to disable)")
                 .define("slowness_3_threshold", 640.0D);
