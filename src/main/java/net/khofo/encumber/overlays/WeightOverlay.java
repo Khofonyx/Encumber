@@ -32,8 +32,8 @@ public class WeightOverlay {
             int screenHeight = minecraft.getWindow().getGuiScaledHeight();
 
             // Specify the position where the text should be rendered
-            int x = screenWidth / 2; // Center x position
-            int y = screenHeight - 49; // Adjust y position to be above the armor bars (you can tweak this value)
+            int x = (screenWidth / 2) + (int)WeightEvent.getThreshold(Configs.WEIGHT_UI_X_OFFSET); // Center x position
+            int y = screenHeight - 49 - (int)WeightEvent.getThreshold(Configs.WEIGHT_UI_Y_OFFSET); // Adjust y position to be above the armor bars (you can tweak this value)
 
             Font font = minecraft.font;
 

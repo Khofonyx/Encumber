@@ -16,6 +16,9 @@ public class Configs {
     public static final ForgeConfigSpec.ConfigValue<Double> SLOWNESS_3_THRESHOLD;
     public static final ForgeConfigSpec.ConfigValue<Double> SLOWNESS_5_THRESHOLD;
 
+    public static final ForgeConfigSpec.ConfigValue<Double> WEIGHT_UI_X_OFFSET;
+    public static final ForgeConfigSpec.ConfigValue<Double> WEIGHT_UI_Y_OFFSET;
+
     static {
         BUILDER.push("Configs for Encumber:");
 
@@ -47,6 +50,12 @@ public class Configs {
 
         SLOWNESS_5_THRESHOLD = BUILDER.comment("If weight is above this, you get slowness 5 (doesn't stack with slowness 1) (set to negative value to disable)")
                 .define("slowness_5_threshold", 1280.0D);
+
+        WEIGHT_UI_Y_OFFSET = BUILDER.comment("Set the vertical offset for the UI that shows your weight (negative values to move down)")
+                .define("weight_ui_y_offset", 0.0D);
+
+        WEIGHT_UI_X_OFFSET = BUILDER.comment("Set the horizontal offset for the UI that shows your weight (negative values to move left)")
+                .define("weight_ui_x_offset", 0.0D);
 
         BUILDER.pop();
         SPEC = BUILDER.build();

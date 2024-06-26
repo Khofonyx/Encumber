@@ -1,16 +1,21 @@
 package net.khofo.encumber;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.gson.JsonSyntaxException;
 import com.google.gson.reflect.TypeToken;
+import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.logging.LogUtils;
+import net.khofo.encumber.commands.WeightCommands;
 import net.khofo.encumber.configs.Configs;
 import net.khofo.encumber.events.WeightEvent;
 import net.khofo.encumber.overlays.WeightOverlay;
+import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.BuildCreativeModeTabContentsEvent;
+import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.event.server.ServerStartingEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -35,9 +40,9 @@ import java.util.stream.Collectors;
 // The value here should match an entry in the META-INF/mods.toml file
 @Mod(Encumber.MOD_ID)
 public class Encumber {
-    private static final Gson GSON = new Gson();
+    private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
     private static final Type ITEM_WEIGHT_TYPE = new TypeToken<Map<String, Double>>() {}.getType();
-    private static Map<ResourceLocation, Double> itemWeights = new HashMap<>();
+    public static Map<ResourceLocation, Double> itemWeights = new HashMap<>();
 
     // Define mod id in a common place for everything to reference
     public static final String MOD_ID = "encumber";
@@ -55,9 +60,27 @@ public class Encumber {
 
     }
 
-    private void commonSetup(final FMLCommonSetupEvent event)
-    {
+    private void commonSetup(final FMLCommonSetupEvent event) {
         loadItemWeights();
+        MinecraftForge.EVENT_BUS.register(WeightCommands.class);
+    }
+
+    public static void updateConfigWeights(){
+        Path configPath = FMLPaths.CONFIGDIR.get().resolve("item_weights.json");
+        System.out.println("Saving item weights to: " + configPath.toAbsolutePath().toString());
+
+        Map<String, Double> weightsToSave = new HashMap<>();
+        itemWeights.forEach((key, value) -> weightsToSave.put(key.toString(), value));
+
+        String json = GSON.toJson(weightsToSave, ITEM_WEIGHT_TYPE);
+
+        try (BufferedWriter writer = Files.newBufferedWriter(configPath)) {
+            writer.write(json);
+            System.out.println("Item weights saved successfully.");
+        } catch (IOException e) {
+            System.err.println("Error saving item weights: " + e.getMessage());
+            e.printStackTrace();
+        }
     }
 
     private void loadItemWeights() {
