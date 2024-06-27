@@ -36,7 +36,7 @@ public class Configs {
                         0.5D, 0.5D, 0.5D, 0.5D, 0.5D, 0.5D, 0.5D, 0.5D, 0.5D, 0.5D,
                         0.5D, 0.5D, 0.5D, 0.5D, 0.5D, 0.5D, 0.5D, 0.5D));
 
-        RIDING_THRESHOLD = BUILDER.comment("If weight is above this, you cannot ride a mount (set to negative value to disable)")
+        RIDING_THRESHOLD = BUILDER.comment("If weight is above this, you cannot ride any mount (set to negative value to disable)")
                 .define("riding_threshold", 1280.0D);
 
         FALL_FLYING_THRESHOLD = BUILDER.comment("If weight is above this, you cannot fly with an elytra (set to negative value to disable)")

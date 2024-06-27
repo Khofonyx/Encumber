@@ -89,8 +89,6 @@ public class WeightEvent {
         return containerWeight[0];
     }
 
-
-
     private static void applyEffectsBasedOnWeight(Player player, double weight) {
         if (weight > getThreshold(Configs.FALL_FLYING_THRESHOLD) && getThreshold(Configs.FALL_FLYING_THRESHOLD) > -1) {
             player.stopFallFlying();
@@ -98,18 +96,11 @@ public class WeightEvent {
         if (weight > getThreshold(Configs.RIDING_THRESHOLD) && getThreshold(Configs.RIDING_THRESHOLD) > -1) {
             player.stopRiding();
         }
-        //if (weight > getThreshold(Configs.SLOWNESS_1_THRESHOLD) && getThreshold(Configs.SLOWNESS_1_THRESHOLD) > -1) {
-           // player.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 6, 1, false, false, false));
-        //}
         if (weight > getThreshold(Configs.SLOWNESS_3_THRESHOLD) && getThreshold(Configs.SLOWNESS_3_THRESHOLD) > -1) {
             player.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 6, 2,false,false,false));
         }
         if (weight > getThreshold(Configs.SLOWNESS_5_THRESHOLD) && getThreshold(Configs.SLOWNESS_5_THRESHOLD) > -1) {
             player.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 6, 4,false,false,false));
-        }
-        if (weight > getThreshold(Configs.JUMPING_THRESHOLD) && getThreshold(Configs.JUMPING_THRESHOLD) > -1) {
-            // Note this won't work past 1.20.4 since they removed allowing negative amplifier values.
-            //player.addEffect(new MobEffectInstance(MobEffects.JUMP, 6, -6,false,false,false));
         }
     }
 
