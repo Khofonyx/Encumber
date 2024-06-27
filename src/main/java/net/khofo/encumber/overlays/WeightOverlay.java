@@ -7,16 +7,24 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.InventoryScreen;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraftforge.client.event.RenderGuiOverlayEvent;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 
 public class WeightOverlay {
+    public static boolean isMenuOpen() {
+        Minecraft minecraft = Minecraft.getInstance();
+        Screen currentScreen = minecraft.screen;
+        return currentScreen != null;
+    }
     @SubscribeEvent(priority = EventPriority.LOWEST)
     public static void onRenderGuiOverlay(RenderGuiOverlayEvent.Post event) {
         Minecraft minecraft = Minecraft.getInstance();
-        if (minecraft.player != null && !minecraft.player.isCreative() && !minecraft.player.isSpectator() && !(minecraft.screen instanceof InventoryScreen)) {
+        if (minecraft.player != null && !minecraft.player.isCreative() && !minecraft.player.isSpectator() && !isMenuOpen()) {
             GuiGraphics guiGraphics = event.getGuiGraphics();
             PoseStack poseStack = guiGraphics.pose();
             double weight = WeightEvent.calculateWeight(minecraft.player);
