@@ -4,19 +4,14 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonSyntaxException;
 import com.google.gson.reflect.TypeToken;
-import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.logging.LogUtils;
 import net.khofo.encumber.commands.WeightCommands;
 import net.khofo.encumber.configs.Configs;
 import net.khofo.encumber.events.WeightEvent;
 import net.khofo.encumber.overlays.WeightOverlay;
-import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.BuildCreativeModeTabContentsEvent;
-import net.minecraftforge.event.RegisterCommandsEvent;
-import net.minecraftforge.event.server.ServerStartingEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.ModLoadingContext;
@@ -43,10 +38,7 @@ public class Encumber {
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
     private static final Type ITEM_WEIGHT_TYPE = new TypeToken<Map<String, Double>>() {}.getType();
     public static Map<ResourceLocation, Double> itemWeights = new HashMap<>();
-
-    // Define mod id in a common place for everything to reference
     public static final String MOD_ID = "encumber";
-    // Directly reference a slf4j logger
     private static final Logger LOGGER = LogUtils.getLogger();
     public Encumber()
     {
@@ -54,10 +46,7 @@ public class Encumber {
         MinecraftForge.EVENT_BUS.register(new WeightEvent());
         modEventBus.addListener(this::commonSetup);
         MinecraftForge.EVENT_BUS.register(this);
-
-        // Register the config
         ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, Configs.SPEC, "encumber-common.toml");
-
     }
 
     private void commonSetup(final FMLCommonSetupEvent event) {
@@ -66,8 +55,8 @@ public class Encumber {
     }
 
     public static void updateConfigWeights(){
+        // Get the path to item_weight.json from configs
         Path configPath = FMLPaths.CONFIGDIR.get().resolve("item_weights.json");
-        System.out.println("Saving item weights to: " + configPath.toAbsolutePath().toString());
 
         Map<String, Double> weightsToSave = new HashMap<>();
         itemWeights.forEach((key, value) -> weightsToSave.put(key.toString(), value));
@@ -76,7 +65,6 @@ public class Encumber {
 
         try (BufferedWriter writer = Files.newBufferedWriter(configPath)) {
             writer.write(json);
-            System.out.println("Item weights saved successfully.");
         } catch (IOException e) {
             System.err.println("Error saving item weights: " + e.getMessage());
             e.printStackTrace();
@@ -84,26 +72,25 @@ public class Encumber {
     }
 
     private void loadItemWeights() {
+        // Get Path to item_weight.json from Configs
         Path configPath = FMLPaths.CONFIGDIR.get().resolve("item_weights.json");
-        System.out.println("Config path: " + configPath.toAbsolutePath().toString());
 
+        // If we find the config file doesn't exist, copy the default one from the resources folder to the configs
         if (!Files.exists(configPath)) {
-            System.out.println("item_weights.json not found in config directory. Copying default file.");
             copyDefaultConfig(configPath);
         } else {
             System.out.println("item_weights.json found in config directory.");
         }
 
+        // Try to read in the content from the Json config file.
         try (BufferedReader reader = Files.newBufferedReader(configPath)) {
             String rawJson = reader.lines().collect(Collectors.joining("\n"));
-            System.out.println("Raw JSON content: " + rawJson);
 
             Map<String, Double> weights = GSON.fromJson(rawJson, ITEM_WEIGHT_TYPE);
             if (weights == null) {
                 System.err.println("item_weights.json is empty or incorrectly formatted.");
             } else {
                 weights.forEach((key, value) -> itemWeights.put(new ResourceLocation(key), value));
-                System.out.println("Loaded item weights successfully.");
                 itemWeights.forEach((key, value) -> System.out.printf("Item: %s, Weight: %s%n", key, value));
             }
         } catch (JsonSyntaxException e) {

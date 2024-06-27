@@ -2,7 +2,6 @@ package net.khofo.encumber.commands;
 
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.DoubleArgumentType;
-import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import net.khofo.encumber.Encumber;
 import net.minecraft.commands.CommandSourceStack;
@@ -24,7 +23,6 @@ public class WeightCommands {
     public static void onRegisterCommandEvent(RegisterCommandsEvent event) {
         CommandDispatcher<CommandSourceStack> commandDispatcher = event.getDispatcher();
         WeightCommands.register(commandDispatcher);
-        System.out.println("Commands registered.");
     }
 
     public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
