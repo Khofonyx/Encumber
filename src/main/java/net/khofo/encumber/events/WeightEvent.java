@@ -40,7 +40,69 @@ public class WeightEvent {
             }
         }
     }
+    public static double getWeightWithBoostItem(Player player, int slownessLevel){
+        double retWeight = 0.0;
+        if (slownessLevel == 3){
+            retWeight = getThreshold(Configs.SLOWNESS_3_THRESHOLD) + getBoostItemAmount(player);
+        }
+        if(slownessLevel == 5){
+            retWeight = getThreshold(Configs.SLOWNESS_5_THRESHOLD) + getBoostItemAmount(player);
+        }
+        return retWeight;
+    }
 
+    public static double getBoostItemAmount(Player player) {
+        double maxBoostAmount = 0.0;
+        List<String> boostItems = Configs.BOOST_ITEMS.get();
+        List<Double> boostAmounts = Configs.BOOST_AMOUNT.get();
+        Boolean allowMultipleBoostItems = getThresholdTF(Configs.ALLOW_MULTIPLE_BOOST_ITEMS);
+
+        if (allowMultipleBoostItems) {
+            // Check inventory, armor, and offhand for multiple boost items
+            for (ItemStack stack : player.getInventory().items) {
+                maxBoostAmount += getBoostAmount(stack, boostItems, boostAmounts);
+            }
+            for (ItemStack stack : player.getInventory().armor) {
+                maxBoostAmount += getBoostAmount(stack, boostItems, boostAmounts);
+            }
+            maxBoostAmount += getBoostAmount(player.getOffhandItem(), boostItems, boostAmounts);
+
+            // If using Curios API, check curios slots as well
+            // TODO: Add Curios slot checking logic here if applicable
+        } else {
+            // Check for the boost item providing the greatest boost amount
+            for (ItemStack stack : player.getInventory().items) {
+                double boostAmount = getBoostAmount(stack, boostItems, boostAmounts);
+                if (boostAmount > maxBoostAmount) {
+                    maxBoostAmount = boostAmount;
+                }
+            }
+            for (ItemStack stack : player.getInventory().armor) {
+                double boostAmount = getBoostAmount(stack, boostItems, boostAmounts);
+                if (boostAmount > maxBoostAmount) {
+                    maxBoostAmount = boostAmount;
+                }
+            }
+            double offhandBoostAmount = getBoostAmount(player.getOffhandItem(), boostItems, boostAmounts);
+            if (offhandBoostAmount > maxBoostAmount) {
+                maxBoostAmount = offhandBoostAmount;
+            }
+
+            // If using Curios API, check curios slots as well
+            // TODO: Add Curios slot checking logic here if applicable
+        }
+        return maxBoostAmount;
+    }
+
+    private static double getBoostAmount(ItemStack stack, List<String> boostItems, List<Double> boostAmounts) {
+        ResourceLocation itemId = BuiltInRegistries.ITEM.getKey(stack.getItem());
+        for (int i = 0; i < boostItems.size(); i++) {
+            if (itemId != null && itemId.toString().equals(boostItems.get(i))) {
+                return boostAmounts.get(i);
+            }
+        }
+        return 0.0;
+    }
     public static double calculateWeight(Player player) {
         double totalWeight = 0.0;
 
@@ -96,10 +158,10 @@ public class WeightEvent {
         if (weight > getThreshold(Configs.RIDING_THRESHOLD) && getThreshold(Configs.RIDING_THRESHOLD) > -1) {
             player.stopRiding();
         }
-        if (weight > getThreshold(Configs.SLOWNESS_3_THRESHOLD) && getThreshold(Configs.SLOWNESS_3_THRESHOLD) > -1) {
+        if (weight > getWeightWithBoostItem(player,3) && getThreshold(Configs.SLOWNESS_3_THRESHOLD) > -1) {
             player.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 6, 2,false,false,false));
         }
-        if (weight > getThreshold(Configs.SLOWNESS_5_THRESHOLD) && getThreshold(Configs.SLOWNESS_5_THRESHOLD) > -1) {
+        if (weight > getWeightWithBoostItem(player,5) && getThreshold(Configs.SLOWNESS_5_THRESHOLD) > -1) {
             player.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 6, 4,false,false,false));
         }
     }
@@ -107,6 +169,12 @@ public class WeightEvent {
     public static double getThreshold(ForgeConfigSpec.ConfigValue<Double> config) {
         return config.get() != null ? config.get() : 0.0D;
     }
+
+    public static Boolean getThresholdTF(ForgeConfigSpec.ConfigValue<Boolean> config) {
+        return config.get() != null ? config.get() : false;
+    }
+
+
 
     private static <T> List<T> iterableToList(Iterable<T> iterable) {
         List<T> list = new ArrayList<>();

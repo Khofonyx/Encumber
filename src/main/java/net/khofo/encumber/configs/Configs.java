@@ -9,20 +9,21 @@ public class Configs {
     public static final ForgeConfigSpec.Builder BUILDER = new ForgeConfigSpec.Builder();
     public static final ForgeConfigSpec SPEC;
     public static final ForgeConfigSpec.ConfigValue<List<String>> CONTAINERS;
-    public static final ForgeConfigSpec.ConfigValue<List<Double>> CONTAINER_MULTIPLIERS;
+    public static final ForgeConfigSpec.ConfigValue<List<String>> BOOST_ITEMS;
+    public static final ForgeConfigSpec.ConfigValue<List<Double>> BOOST_AMOUNT;
     public static final ForgeConfigSpec.ConfigValue<Double> RIDING_THRESHOLD;
     public static final ForgeConfigSpec.ConfigValue<Double> FALL_FLYING_THRESHOLD;
     public static final ForgeConfigSpec.ConfigValue<Double> JUMPING_THRESHOLD;
     public static final ForgeConfigSpec.ConfigValue<Double> SLOWNESS_3_THRESHOLD;
     public static final ForgeConfigSpec.ConfigValue<Double> SLOWNESS_5_THRESHOLD;
-
     public static final ForgeConfigSpec.ConfigValue<Double> WEIGHT_UI_X_OFFSET;
     public static final ForgeConfigSpec.ConfigValue<Double> WEIGHT_UI_Y_OFFSET;
+    public static final ForgeConfigSpec.ConfigValue<Boolean> ALLOW_MULTIPLE_BOOST_ITEMS;
 
     static {
-        BUILDER.push("Configs for Encumber:");
+        BUILDER.push("Configs for Encumbered:");
 
-        CONTAINERS = BUILDER.comment("Which container items should be checked? (sync this list to the one below)")
+        CONTAINERS = BUILDER.comment("Which container items should be checked?")
                 .define("container_item", Arrays.asList(
                         "minecraft:shulker_box", "minecraft:white_shulker_box", "minecraft:orange_shulker_box",
                         "minecraft:magenta_shulker_box", "minecraft:light_blue_shulker_box", "minecraft:yellow_shulker_box",
@@ -31,10 +32,11 @@ public class Configs {
                         "minecraft:blue_shulker_box", "minecraft:brown_shulker_box", "minecraft:green_shulker_box",
                         "minecraft:red_shulker_box", "minecraft:black_shulker_box"));
 
-        CONTAINER_MULTIPLIERS = BUILDER.comment("By how much should each of the containers above reduce the weight of its contents? (should be a number in [0.0, 1.0])")
-                .define("container_multipliers", Arrays.asList(
-                        0.5D, 0.5D, 0.5D, 0.5D, 0.5D, 0.5D, 0.5D, 0.5D, 0.5D, 0.5D,
-                        0.5D, 0.5D, 0.5D, 0.5D, 0.5D, 0.5D, 0.5D, 0.5D));
+        BOOST_ITEMS = BUILDER.comment("Add any items you want to boost the player's carrying capacity")
+                .define("boost_items", Arrays.asList("minecraft:diamond_helmet","minecraft:emerald"));
+
+        BOOST_AMOUNT = BUILDER.comment("Add boost amounts that correspond to the BOOST_ITEMS above")
+                .define("boost_amount", Arrays.asList(100.0D,1000.0D));
 
         RIDING_THRESHOLD = BUILDER.comment("If weight is above this, you cannot ride any mount (set to negative value to disable)")
                 .define("riding_threshold", 1280.0D);
@@ -56,6 +58,9 @@ public class Configs {
 
         WEIGHT_UI_X_OFFSET = BUILDER.comment("Set the horizontal offset for the UI that shows your weight (negative values to move left)")
                 .define("weight_ui_x_offset", 0.0D);
+
+        ALLOW_MULTIPLE_BOOST_ITEMS = BUILDER.comment("Whether or not boost item's additional capacities stack. If there are multiple boost items present in your inventory and this is false, it chooses the better boost item")
+                .define("allow_multiple_boost_items", false);
 
         BUILDER.pop();
         SPEC = BUILDER.build();
