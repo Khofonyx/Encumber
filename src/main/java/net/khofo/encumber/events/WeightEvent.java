@@ -33,7 +33,7 @@ public class WeightEvent {
         if (event.getEntity() instanceof Player) {
             Player player = (Player) event.getEntity();
             if (!player.isSpectator() && !player.isCreative()) {
-                if (calculateWeight(player) > getThreshold(Configs.JUMPING_THRESHOLD)) {
+                if (calculateWeight(player) >= getThreshold(Configs.JUMPING_THRESHOLD)) {
                     player.setDeltaMovement(0, 0, 0);
                     player.hasImpulse = true;
                 }
@@ -152,17 +152,17 @@ public class WeightEvent {
     }
 
     private static void applyEffectsBasedOnWeight(Player player, double weight) {
-        if (weight > getThreshold(Configs.FALL_FLYING_THRESHOLD) && getThreshold(Configs.FALL_FLYING_THRESHOLD) > -1) {
-            player.stopFallFlying();
-        }
-        if (weight > getThreshold(Configs.RIDING_THRESHOLD) && getThreshold(Configs.RIDING_THRESHOLD) > -1) {
-            player.stopRiding();
-        }
-        if (weight > getWeightWithBoostItem(player,3) && getThreshold(Configs.SLOWNESS_3_THRESHOLD) > -1) {
+        if (weight >= getWeightWithBoostItem(player,5) && getThreshold(Configs.SLOWNESS_5_THRESHOLD) > -1) {
+            player.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 6, 4,false,false,false));
+        }else if (weight >= getWeightWithBoostItem(player,3) && getThreshold(Configs.SLOWNESS_3_THRESHOLD) > -1) {
             player.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 6, 2,false,false,false));
         }
-        if (weight > getWeightWithBoostItem(player,5) && getThreshold(Configs.SLOWNESS_5_THRESHOLD) > -1) {
-            player.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 6, 4,false,false,false));
+
+        if (weight >= getThreshold(Configs.FALL_FLYING_THRESHOLD) && getThreshold(Configs.FALL_FLYING_THRESHOLD) > -1) {
+            player.stopFallFlying();
+        }
+        if (weight >= getThreshold(Configs.RIDING_THRESHOLD) && getThreshold(Configs.RIDING_THRESHOLD) > -1) {
+            player.stopRiding();
         }
     }
 
