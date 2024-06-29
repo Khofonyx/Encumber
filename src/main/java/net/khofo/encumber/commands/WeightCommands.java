@@ -35,6 +35,15 @@ public class WeightCommands {
                                 .then(Commands.argument("item", ResourceLocationArgument.id())
                                         .then(Commands.argument("weight", DoubleArgumentType.doubleArg())
                                                 .executes(context -> setItemWeight(context, ResourceLocationArgument.getId(context, "item"), DoubleArgumentType.getDouble(context, "weight"))))))
+                        /*.then(Commands.literal("boost")
+                                .then(Commands.literal("set")
+                                        .then(Commands.argument("item", ResourceLocationArgument.id())
+                                            .then(Commands.argument("weight", DoubleArgumentType.doubleArg())
+                                                .executes(context -> getItemWeight(context, ResourceLocationArgument.getId(context, "item")))))))
+                        .then(Commands.literal("boost")
+                                .then(Commands.literal("get")
+                                        .then(Commands.argument("item", ResourceLocationArgument.id())
+                                                .executes(context -> getItemWeight(context, ResourceLocationArgument.getId(context, "item")))))) */
         );
     }
 
