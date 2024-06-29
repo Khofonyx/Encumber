@@ -28,7 +28,7 @@ public class WeightOverlay {
             GuiGraphics guiGraphics = event.getGuiGraphics();
             PoseStack poseStack = guiGraphics.pose();
             double weight = WeightEvent.calculateWeight(minecraft.player);
-            String weightText = "Weight: " + weight + "/" + WeightEvent.getWeightWithBoostItem(minecraft.player,5);
+            String weightText = "Weight: " + weight + "/" + Math.abs(WeightEvent.getWeightWithBoostItem(minecraft.player,1));
 
             // Render the weight text on the screen
             poseStack.pushPose();
@@ -47,15 +47,15 @@ public class WeightOverlay {
             // Calculate the width of the text to center it properly
             int textWidth = font.width(weightText);
 
-            if(weight < WeightEvent.getWeightWithBoostItem(minecraft.player,3)){
+            if(weight < WeightEvent.getWeightWithBoostItem(minecraft.player,0)){
                 font.drawInBatch(weightText, x - textWidth / 2, y, 0xFFFFFF, true, poseStack.last().pose(), guiGraphics.bufferSource(), Font.DisplayMode.NORMAL, 0, 15728880);
             }
 
-            if(weight >= WeightEvent.getWeightWithBoostItem(minecraft.player,3) && weight < WeightEvent.getWeightWithBoostItem(minecraft.player,5)){
+            if(weight >= WeightEvent.getWeightWithBoostItem(minecraft.player,0) && weight < WeightEvent.getWeightWithBoostItem(minecraft.player,1)){
                 font.drawInBatch(weightText, x - textWidth / 2, y, 0xE9CF11, true, poseStack.last().pose(), guiGraphics.bufferSource(), Font.DisplayMode.SEE_THROUGH, 0, 15728880);
             }
 
-            if(weight >= WeightEvent.getWeightWithBoostItem(minecraft.player,5)){
+            if(weight >= WeightEvent.getWeightWithBoostItem(minecraft.player,1)){
                 font.drawInBatch(weightText, x - textWidth / 2, y, 0xE30C0C, true, poseStack.last().pose(), guiGraphics.bufferSource(), Font.DisplayMode.NORMAL, 0, 15728880);
             }
 

@@ -2,17 +2,24 @@ package net.khofo.encumber.events;
 
 import net.khofo.encumber.Encumber;
 import net.khofo.encumber.configs.Configs;
+import net.khofo.encumber.mixins.LocalPlayerInvoker;
+import net.khofo.encumber.mixins.PlayerMixin;
+import net.minecraft.client.KeyMapping;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import net.minecraftforge.client.event.InputEvent;
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.living.LivingEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
+import org.spongepowered.asm.mixin.injection.modify.LocalVariableDiscriminator;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,20 +40,28 @@ public class WeightEvent {
         if (event.getEntity() instanceof Player) {
             Player player = (Player) event.getEntity();
             if (!player.isSpectator() && !player.isCreative()) {
-                if (calculateWeight(player) >= getThreshold(Configs.JUMPING_THRESHOLD)) {
-                    player.setDeltaMovement(0, 0, 0);
-                    player.hasImpulse = true;
+                if(getThresholdTF(Configs.RIDING_FLYING_JUMPING_TIED_TO_SLOWNESS_5_THRESHOLD)){
+                    if (calculateWeight(player) >= getWeightWithBoostItem(player,1)) {
+                        player.setDeltaMovement(0, 0, 0);
+                        player.hasImpulse = true;
+                    }
+                }else{
+                    if (calculateWeight(player) >= getThreshold(Configs.JUMPING_THRESHOLD)) {
+                        player.setDeltaMovement(0, 0, 0);
+                        player.hasImpulse = true;
+                    }
                 }
             }
         }
     }
+
     public static double getWeightWithBoostItem(Player player, int slownessLevel){
         double retWeight = 0.0;
-        if (slownessLevel == 3){
-            retWeight = getThreshold(Configs.SLOWNESS_3_THRESHOLD) + getBoostItemAmount(player);
+        if (slownessLevel == 0){
+            retWeight = getThreshold(Configs.ENCUMBERED_THRESHOLD) + getBoostItemAmount(player);
         }
-        if(slownessLevel == 5){
-            retWeight = getThreshold(Configs.SLOWNESS_5_THRESHOLD) + getBoostItemAmount(player);
+        if(slownessLevel == 1){
+            retWeight = getThreshold(Configs.OVER_ENCUMBERED_THRESHOLD) + getBoostItemAmount(player);
         }
         return retWeight;
     }
@@ -147,22 +162,34 @@ public class WeightEvent {
                 }
             }
         });
-
         return containerWeight[0];
     }
 
     private static void applyEffectsBasedOnWeight(Player player, double weight) {
-        if (weight >= getWeightWithBoostItem(player,5) && getThreshold(Configs.SLOWNESS_5_THRESHOLD) > -1) {
-            player.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 6, 4,false,false,false));
-        }else if (weight >= getWeightWithBoostItem(player,3) && getThreshold(Configs.SLOWNESS_3_THRESHOLD) > -1) {
-            player.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 6, 2,false,false,false));
+        if (weight >= getWeightWithBoostItem(player, 1) && getThreshold(Configs.OVER_ENCUMBERED_THRESHOLD) > -1) {
+            player.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 6, 4, false, false, false));
+            if (getThresholdTF(Configs.RIDING_FLYING_JUMPING_TIED_TO_SLOWNESS_5_THRESHOLD)) {
+                player.stopFallFlying();
+                player.stopRiding();
+            }
+        } else if (weight >= getWeightWithBoostItem(player, 0) && getThreshold(Configs.ENCUMBERED_THRESHOLD) > -1) {
+            //player.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 6, 1, false, false, false));
+            if (player instanceof LocalPlayer) {
+                LocalPlayer localPlayer = (LocalPlayer) player;
+                boolean canSprint = ((LocalPlayerInvoker) localPlayer).invokeCanStartSprinting();
+                if (!canSprint) {
+                    localPlayer.setSprinting(false);
+                }
+            }
         }
 
-        if (weight >= getThreshold(Configs.FALL_FLYING_THRESHOLD) && getThreshold(Configs.FALL_FLYING_THRESHOLD) > -1) {
-            player.stopFallFlying();
-        }
-        if (weight >= getThreshold(Configs.RIDING_THRESHOLD) && getThreshold(Configs.RIDING_THRESHOLD) > -1) {
-            player.stopRiding();
+        if(!getThresholdTF(Configs.RIDING_FLYING_JUMPING_TIED_TO_SLOWNESS_5_THRESHOLD)){
+            if (weight >= getThreshold(Configs.FALL_FLYING_THRESHOLD) && getThreshold(Configs.FALL_FLYING_THRESHOLD) > -1) {
+                player.stopFallFlying();
+            }
+            if (weight >= getThreshold(Configs.RIDING_THRESHOLD) && getThreshold(Configs.RIDING_THRESHOLD) > -1) {
+                player.stopRiding();
+            }
         }
     }
 

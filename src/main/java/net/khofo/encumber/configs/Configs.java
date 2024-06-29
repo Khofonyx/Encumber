@@ -14,11 +14,13 @@ public class Configs {
     public static final ForgeConfigSpec.ConfigValue<Double> RIDING_THRESHOLD;
     public static final ForgeConfigSpec.ConfigValue<Double> FALL_FLYING_THRESHOLD;
     public static final ForgeConfigSpec.ConfigValue<Double> JUMPING_THRESHOLD;
-    public static final ForgeConfigSpec.ConfigValue<Double> SLOWNESS_3_THRESHOLD;
-    public static final ForgeConfigSpec.ConfigValue<Double> SLOWNESS_5_THRESHOLD;
+    public static final ForgeConfigSpec.ConfigValue<Double> ENCUMBERED_THRESHOLD;
+    public static final ForgeConfigSpec.ConfigValue<Double> OVER_ENCUMBERED_THRESHOLD;
     public static final ForgeConfigSpec.ConfigValue<Double> WEIGHT_UI_X_OFFSET;
     public static final ForgeConfigSpec.ConfigValue<Double> WEIGHT_UI_Y_OFFSET;
     public static final ForgeConfigSpec.ConfigValue<Boolean> ALLOW_MULTIPLE_BOOST_ITEMS;
+
+    public static final ForgeConfigSpec.ConfigValue<Boolean> RIDING_FLYING_JUMPING_TIED_TO_SLOWNESS_5_THRESHOLD;
 
     static {
         BUILDER.push("Configs for Encumbered:");
@@ -38,6 +40,9 @@ public class Configs {
         BOOST_AMOUNT = BUILDER.comment("Add boost amounts that correspond to the BOOST_ITEMS above")
                 .define("boost_amount", Arrays.asList(100.0D,1000.0D));
 
+        RIDING_FLYING_JUMPING_TIED_TO_SLOWNESS_5_THRESHOLD = BUILDER.comment("If this is true, when they player is at the SLOWNESS_5_THRESHOLD, they cannot jump, fly, or ride mounts. If false, you can configure these thresholds below.")
+                .define("tie_to_slowness_5_threshold", true);
+
         RIDING_THRESHOLD = BUILDER.comment("If weight is above this, you cannot ride any mount (set to negative value to disable)")
                 .define("riding_threshold", 1280.0D);
 
@@ -47,11 +52,11 @@ public class Configs {
         JUMPING_THRESHOLD = BUILDER.comment("If weight is above this, you cannot jump (set to negative value to disable)")
                 .define("jumping_threshold", 1280.0D);
 
-        SLOWNESS_3_THRESHOLD = BUILDER.comment("If weight is above this, you get slowness 3 (doesn't stack with slowness 1) (set to negative value to disable)")
-                .define("slowness_3_threshold", 640.0D);
+        ENCUMBERED_THRESHOLD = BUILDER.comment("If weight is above this, you cannot sprint (set to negative value to disable)")
+                .define("encumbered_threshold", 640.0D);
 
-        SLOWNESS_5_THRESHOLD = BUILDER.comment("If weight is above this, you get slowness 5 (doesn't stack with slowness 1) (set to negative value to disable)")
-                .define("slowness_5_threshold", 1280.0D);
+        OVER_ENCUMBERED_THRESHOLD = BUILDER.comment("If weight is above this, you get slowness 5, cannot jump, and cannot sprint (set to negative value to disable)")
+                .define("over_encumbered_threshold", 1280.0D);
 
         WEIGHT_UI_Y_OFFSET = BUILDER.comment("Set the vertical offset for the UI that shows your weight (negative values to move down)")
                 .define("weight_ui_y_offset", 0.0D);
