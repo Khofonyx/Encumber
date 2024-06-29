@@ -37,7 +37,7 @@ public class WeightEvent {
         if (event.getEntity() instanceof Player) {
             Player player = (Player) event.getEntity();
             if (!player.isSpectator() && !player.isCreative()) {
-                if(getThresholdTF(Configs.RIDING_FLYING_JUMPING_TIED_TO_SLOWNESS_5_THRESHOLD)){
+                if(getThresholdTF(Configs.RIDING_FLYING_JUMPING_TIED_TO_OVER_ENCUMBERED_THRESHOLD)){
                     if (calculateWeight(player) >= getWeightWithBoostItem(player,1)) {
                         player.setDeltaMovement(0, 0, 0);
                         player.hasImpulse = true;
@@ -165,10 +165,10 @@ public class WeightEvent {
     private static void applyEffectsBasedOnWeight(Player player, double weight) {
         if (weight >= getWeightWithBoostItem(player, 1) && getThreshold(Configs.OVER_ENCUMBERED_THRESHOLD) > -1) {
             player.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 6, 4, false, false, false));
-            if (getThresholdTF(Configs.RIDING_FLYING_JUMPING_TIED_TO_SLOWNESS_5_THRESHOLD)) {
+            if (getThresholdTF(Configs.RIDING_FLYING_JUMPING_TIED_TO_OVER_ENCUMBERED_THRESHOLD)) {
                 player.stopFallFlying();
                 player.stopRiding();
-                if (player.isInWater() || player.isInLava()){
+                if ((player.isInWater() || player.isInLava()) && getThresholdTF(Configs.SINK_IN_WATER_LAVA)){
                     ((LivingEntityAccessor) player).callJumpInLiquid(FluidTags.WATER);
                 }
             }
@@ -183,7 +183,7 @@ public class WeightEvent {
             }
         }
 
-        if(!getThresholdTF(Configs.RIDING_FLYING_JUMPING_TIED_TO_SLOWNESS_5_THRESHOLD)){
+        if(!getThresholdTF(Configs.RIDING_FLYING_JUMPING_TIED_TO_OVER_ENCUMBERED_THRESHOLD)){
             if (weight >= getThreshold(Configs.FALL_FLYING_THRESHOLD) && getThreshold(Configs.FALL_FLYING_THRESHOLD) > -1) {
                 player.stopFallFlying();
             }

@@ -19,8 +19,8 @@ public class Configs {
     public static final ForgeConfigSpec.ConfigValue<Double> WEIGHT_UI_X_OFFSET;
     public static final ForgeConfigSpec.ConfigValue<Double> WEIGHT_UI_Y_OFFSET;
     public static final ForgeConfigSpec.ConfigValue<Boolean> ALLOW_MULTIPLE_BOOST_ITEMS;
-
-    public static final ForgeConfigSpec.ConfigValue<Boolean> RIDING_FLYING_JUMPING_TIED_TO_SLOWNESS_5_THRESHOLD;
+    public static final ForgeConfigSpec.ConfigValue<Boolean> RIDING_FLYING_JUMPING_TIED_TO_OVER_ENCUMBERED_THRESHOLD;
+    public static final ForgeConfigSpec.ConfigValue<Boolean> SINK_IN_WATER_LAVA;
 
     static {
         BUILDER.push("Configs for Encumbered:");
@@ -40,32 +40,35 @@ public class Configs {
         BOOST_AMOUNT = BUILDER.comment("Add boost amounts that correspond to the BOOST_ITEMS above")
                 .define("boost_amount", Arrays.asList(100.0D,1000.0D));
 
-        RIDING_FLYING_JUMPING_TIED_TO_SLOWNESS_5_THRESHOLD = BUILDER.comment("If this is true, when they player is at the SLOWNESS_5_THRESHOLD, they cannot jump, fly, or ride mounts. If false, you can configure these thresholds below.")
-                .define("tie_to_slowness_5_threshold", true);
+        RIDING_FLYING_JUMPING_TIED_TO_OVER_ENCUMBERED_THRESHOLD = BUILDER.comment("If this is true, when they player is at the OVER_ENCUMBERED_THRESHOLD, they cannot jump, fly, or ride mounts. If false, you can configure these thresholds below. default: true")
+                .define("tie_to_over_encumbered_threshold", true);
 
-        RIDING_THRESHOLD = BUILDER.comment("If weight is above this, you cannot ride any mount (set to negative value to disable)")
+        RIDING_THRESHOLD = BUILDER.comment("If weight is above this, you cannot ride any mount (Negative values will break the mod)")
                 .define("riding_threshold", 1280.0D);
 
-        FALL_FLYING_THRESHOLD = BUILDER.comment("If weight is above this, you cannot fly with an elytra (set to negative value to disable)")
+        FALL_FLYING_THRESHOLD = BUILDER.comment("If weight is above this, you cannot fly with an elytra (Negative values will break the mod)")
                 .define("fall_flying_threshold", 128.0D);
 
-        JUMPING_THRESHOLD = BUILDER.comment("If weight is above this, you cannot jump (set to negative value to disable)")
+        JUMPING_THRESHOLD = BUILDER.comment("If weight is above this, you cannot jump (Negative values will break the mod)")
                 .define("jumping_threshold", 1280.0D);
 
-        ENCUMBERED_THRESHOLD = BUILDER.comment("If weight is above this, you cannot sprint (set to negative value to disable)")
+        ENCUMBERED_THRESHOLD = BUILDER.comment("If weight is above this, you cannot sprint (Negative values will break the mod)")
                 .define("encumbered_threshold", 640.0D);
 
-        OVER_ENCUMBERED_THRESHOLD = BUILDER.comment("If weight is above this, you get slowness 5, cannot jump, and cannot sprint (set to negative value to disable)")
+        OVER_ENCUMBERED_THRESHOLD = BUILDER.comment("If weight is above this, you get slowness 5, cannot jump, and cannot sprint (Negative values will break the mod)")
                 .define("over_encumbered_threshold", 1280.0D);
 
-        WEIGHT_UI_Y_OFFSET = BUILDER.comment("Set the vertical offset for the UI that shows your weight (negative values to move down)")
+        WEIGHT_UI_Y_OFFSET = BUILDER.comment("Set the vertical offset for the UI that shows your weight (negative values to move down). default: 0.0D")
                 .define("weight_ui_y_offset", 0.0D);
 
-        WEIGHT_UI_X_OFFSET = BUILDER.comment("Set the horizontal offset for the UI that shows your weight (negative values to move left)")
+        WEIGHT_UI_X_OFFSET = BUILDER.comment("Set the horizontal offset for the UI that shows your weight (negative values to move left). default: 0.0D")
                 .define("weight_ui_x_offset", 0.0D);
 
-        ALLOW_MULTIPLE_BOOST_ITEMS = BUILDER.comment("Whether or not boost item's additional capacities stack. If there are multiple boost items present in your inventory and this is false, it chooses the better boost item")
+        ALLOW_MULTIPLE_BOOST_ITEMS = BUILDER.comment("Whether or not boost item's additional capacities stack. If there are multiple boost items present in your inventory and this is false, it chooses the better boost item. default: false")
                 .define("allow_multiple_boost_items", false);
+
+        SINK_IN_WATER_LAVA = BUILDER.comment("Whether or not the player sinks in WATER and LAVA while OVER_ENCUBMERED. default: true")
+                .define("sink_in_water_and_lava", true);
 
         BUILDER.pop();
         SPEC = BUILDER.build();
