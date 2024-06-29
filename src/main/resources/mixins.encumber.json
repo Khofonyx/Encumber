@@ -5,7 +5,9 @@
   "refmap": "encumber.mixin-refmap.json",
   "mixins": [
     "PlayerMixin",
-    "LocalPlayerInvoker"
+    "LocalPlayerInvoker",
+    "PlayerSinkMixin",
+    "MixinLivingEntity"
   ],
   "injectors": {
     "defaultRequire": 1

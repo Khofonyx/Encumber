@@ -2,10 +2,12 @@ package net.khofo.encumber.events;
 
 import net.khofo.encumber.Encumber;
 import net.khofo.encumber.configs.Configs;
+import net.khofo.encumber.accessors.LivingEntityAccessor;
 import net.khofo.encumber.mixins.LocalPlayerInvoker;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.tags.FluidTags;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.player.Player;
@@ -166,6 +168,9 @@ public class WeightEvent {
             if (getThresholdTF(Configs.RIDING_FLYING_JUMPING_TIED_TO_SLOWNESS_5_THRESHOLD)) {
                 player.stopFallFlying();
                 player.stopRiding();
+                if (player.isInWater() || player.isInLava()){
+                    ((LivingEntityAccessor) player).callJumpInLiquid(FluidTags.WATER);
+                }
             }
         } else if (weight >= getWeightWithBoostItem(player, 0) && getThreshold(Configs.ENCUMBERED_THRESHOLD) > -1) {
             //player.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 6, 1, false, false, false));
