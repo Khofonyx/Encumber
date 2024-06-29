@@ -6,8 +6,6 @@
   "mixins": [
     "PlayerMixin",
     "LocalPlayerInvoker",
-    "PlayerSinkMixin",
-    "MixinLivingEntity"
   ],
   "injectors": {
     "defaultRequire": 1

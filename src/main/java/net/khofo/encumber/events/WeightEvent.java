@@ -4,6 +4,7 @@ import net.khofo.encumber.Encumber;
 import net.khofo.encumber.configs.Configs;
 import net.khofo.encumber.accessors.LivingEntityAccessor;
 import net.khofo.encumber.mixins.LocalPlayerInvoker;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
@@ -12,7 +13,9 @@ import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.common.ForgeConfigSpec;
+import net.minecraftforge.common.ForgeMod;
 import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.living.LivingEvent;
@@ -169,7 +172,12 @@ public class WeightEvent {
                 player.stopFallFlying();
                 player.stopRiding();
                 if ((player.isInWater() || player.isInLava()) && getThresholdTF(Configs.SINK_IN_WATER_LAVA)){
-                    ((LivingEntityAccessor) player).callJumpInLiquid(FluidTags.WATER);
+                    boolean spacebarPressed = Minecraft.getInstance().options.keyJump.isDown();
+                    if (spacebarPressed){
+                        player.setDeltaMovement(new Vec3(0.0D, (double)-0.08F * player.getAttributeValue(ForgeMod.SWIM_SPEED.get()), 0.0D));
+                    }else{
+                        player.setDeltaMovement(new Vec3(0.0D, (double)-0.04F * player.getAttributeValue(ForgeMod.SWIM_SPEED.get()), 0.0D));
+                    }
                 }
             }
         } else if (weight >= getWeightWithBoostItem(player, 0) && getThreshold(Configs.ENCUMBERED_THRESHOLD) > -1) {
