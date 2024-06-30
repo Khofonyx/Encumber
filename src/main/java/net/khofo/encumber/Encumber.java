@@ -10,6 +10,8 @@ import net.khofo.encumber.configs.Configs;
 import net.khofo.encumber.events.WeightEvent;
 import net.khofo.encumber.overlays.WeightOverlay;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.tags.TagKey;
+import net.minecraft.world.item.*;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.IEventBus;
@@ -21,6 +23,7 @@ import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.fml.loading.FMLPaths;
+import net.minecraftforge.registries.ForgeRegistries;
 import org.slf4j.Logger;
 
 import java.io.*;
@@ -39,7 +42,17 @@ public class Encumber {
     private static final Type ITEM_WEIGHT_TYPE = new TypeToken<Map<String, Double>>() {}.getType();
     public static Map<ResourceLocation, Double> itemWeights = new HashMap<>();
     public static final String MOD_ID = "encumber";
+    private static final Map<String, Double> defaultCategoryWeights = new HashMap<>();
     private static final Logger LOGGER = LogUtils.getLogger();
+
+    static {
+        defaultCategoryWeights.put("weapons", 5.0);
+        defaultCategoryWeights.put("armor", 8.0);
+        defaultCategoryWeights.put("tools", 4.0);
+        defaultCategoryWeights.put("resources", 3.0);
+        defaultCategoryWeights.put("consumables", 1.0);
+        defaultCategoryWeights.put("miscellaneous", 2.0);
+    }
     public Encumber()
     {
         IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
@@ -54,8 +67,7 @@ public class Encumber {
         MinecraftForge.EVENT_BUS.register(WeightCommands.class);
     }
 
-    public static void updateConfigWeights(){
-        // Get the path to item_weight.json from configs
+    public static void updateConfigWeights() {
         Path configPath = FMLPaths.CONFIGDIR.get().resolve("item_weights.json");
 
         Map<String, Double> weightsToSave = new HashMap<>();
@@ -72,62 +84,74 @@ public class Encumber {
     }
 
     private void loadItemWeights() {
-        // Get Path to item_weight.json from Configs
         Path configPath = FMLPaths.CONFIGDIR.get().resolve("item_weights.json");
 
-        // If we find the config file doesn't exist, copy the default one from the resources folder to the configs
-        if (!Files.exists(configPath)) {
-            copyDefaultConfig(configPath);
-        } else {
-            System.out.println("item_weights.json found in config directory.");
-        }
-
-        // Try to read in the content from the Json config file.
+        // Load existing weights from the config file
         try (BufferedReader reader = Files.newBufferedReader(configPath)) {
             String rawJson = reader.lines().collect(Collectors.joining("\n"));
-
             Map<String, Double> weights = GSON.fromJson(rawJson, ITEM_WEIGHT_TYPE);
-            if (weights == null) {
-                System.err.println("item_weights.json is empty or incorrectly formatted.");
-            } else {
+            if (weights != null) {
                 weights.forEach((key, value) -> itemWeights.put(new ResourceLocation(key), value));
-                itemWeights.forEach((key, value) -> System.out.printf("Item: %s, Weight: %s%n", key, value));
+            } else {
+                System.err.println("item_weights.json is empty or incorrectly formatted.");
             }
-        } catch (JsonSyntaxException e) {
-            System.err.println("Error parsing item_weights.json: " + e.getMessage());
-            e.printStackTrace();
         } catch (IOException e) {
             System.err.println("Error loading item weights: " + e.getMessage());
             e.printStackTrace();
         }
+
+        // Assign default weights to items not present in the config file
+        for (Item item : ForgeRegistries.ITEMS) {
+            ResourceLocation itemName = ForgeRegistries.ITEMS.getKey(item);
+            if (!itemWeights.containsKey(itemName)) {
+                double weight = assignWeightByCategory(item);
+                itemWeights.put(itemName, weight);
+                System.out.printf("Item: %s, Category Weight: %s%n", itemName, weight); // Debugging statement
+            }
+        }
+
+        // Save updated weights back to the config file
+        updateConfigWeights();
     }
 
-    private void copyDefaultConfig(Path configPath) {
-        try (InputStream inputStream = getClass().getResourceAsStream("/assets/encumber/item_weights.json")) {
-            if (inputStream == null) {
-                System.err.println("Default item_weights.json not found in resources");
-                return;
-            }
-            Files.createDirectories(configPath.getParent());
-            try (OutputStream outputStream = Files.newOutputStream(configPath)) {
-                byte[] buffer = new byte[1024];
-                int length;
-                while ((length = inputStream.read(buffer)) > 0) {
-                    outputStream.write(buffer, 0, length);
-                }
-            }
+    public static double getItemWeight(ResourceLocation itemName) {
+        if (itemWeights.containsKey(itemName)) {
+            return itemWeights.get(itemName);
+        }
 
-            System.out.println("Copied default item_weights.json to config directory");
-        } catch (IOException e) {
-            System.err.println("Error copying default item_weights.json to config directory");
-            e.printStackTrace();
+        Item item = ForgeRegistries.ITEMS.getValue(itemName);
+        if (item == null) {
+            return 1.0; // Default weight if the item is not found in the registry
+        }
+
+        double weight = assignWeightByCategory(item);
+        itemWeights.put(itemName, weight);
+        updateConfigWeights(); // Save the new weight to the config file
+        return weight;
+    }
+
+    private static double assignWeightByCategory(Item item) {
+        if (item instanceof SwordItem || item instanceof AxeItem) {
+            return defaultCategoryWeights.get("weapons");
+        } else if (item instanceof ArmorItem) {
+            return defaultCategoryWeights.get("armor");
+        } else if (item instanceof PickaxeItem || item instanceof ShovelItem || item instanceof HoeItem) {
+            return defaultCategoryWeights.get("tools");
+        } else if (item == Items.IRON_INGOT || item == Items.GOLD_INGOT || item == Items.DIAMOND || item == Items.EMERALD) {
+            return defaultCategoryWeights.get("resources");
+        } else if (item.isEdible()) {
+            return defaultCategoryWeights.get("consumables");
+        } else {
+            return defaultCategoryWeights.get("miscellaneous");
         }
     }
 
-    public static double getItemWeight(ResourceLocation item) {
-        return itemWeights.getOrDefault(item, 1.0); // Default weight if not found
+    private static boolean isTaggedAs(Item item, String tagName) {
+        TagKey<Item> tagKey = TagKey.create(ForgeRegistries.ITEMS.getRegistryKey(), new ResourceLocation(tagName));
+        boolean isTagged = item.builtInRegistryHolder().is(tagKey);
+        System.out.printf("Item: %s, Tag: %s, IsTagged: %s%n", ForgeRegistries.ITEMS.getKey(item), tagName, isTagged); // Debugging statement
+        return isTagged;
     }
-
 
     // You can use EventBusSubscriber to automatically register all static methods in the class annotated with @SubscribeEvent
     @Mod.EventBusSubscriber(modid = MOD_ID, bus = Mod.EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
