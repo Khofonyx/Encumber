@@ -7,8 +7,12 @@ import com.google.gson.reflect.TypeToken;
 import com.mojang.logging.LogUtils;
 import net.khofo.encumber.commands.WeightCommands;
 import net.khofo.encumber.configs.Configs;
+import net.khofo.encumber.events.ClientEventHandler;
 import net.khofo.encumber.events.WeightEvent;
+import net.khofo.encumber.overlays.WeightEditScreen;
 import net.khofo.encumber.overlays.WeightOverlay;
+import net.minecraft.client.Minecraft;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.*;
@@ -60,6 +64,7 @@ public class Encumber {
         modEventBus.addListener(this::commonSetup);
         MinecraftForge.EVENT_BUS.register(this);
         ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, Configs.SPEC, "encumber-common.toml");
+        MinecraftForge.EVENT_BUS.register(ClientEventHandler.KeyInputHandler.class);
     }
 
     private void commonSetup(final FMLCommonSetupEvent event) {

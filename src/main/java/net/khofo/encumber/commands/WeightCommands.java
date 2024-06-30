@@ -76,7 +76,7 @@ public class WeightCommands {
         }
     }
 
-    private static int setItemWeight(CommandContext<CommandSourceStack> context, ResourceLocation item, double weight) {
+    public static int setItemWeight(CommandContext<CommandSourceStack> context, ResourceLocation item, double weight) {
         try {
             Encumber.itemWeights.put(item, weight);
             Encumber.updateConfigWeights();
@@ -89,7 +89,7 @@ public class WeightCommands {
         }
     }
 
-    private static int setGroupWeight(CommandContext<CommandSourceStack> context, String group, double weight) {
+    public static int setGroupWeight(CommandContext<CommandSourceStack> context, String group, double weight) {
         if (ItemGroups.groups.containsKey(group)) {
             List<Item> items = ItemGroups.groups.get(group);
             for (Item item : items) {

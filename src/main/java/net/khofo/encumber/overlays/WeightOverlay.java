@@ -73,7 +73,7 @@ public class WeightOverlay {
                     icon_y += (random.nextInt(1) - 1); // Random jiggle of -1, 0, or 1
                 }
             }
-
+            
             RenderSystem.setShader(GameRenderer::getPositionTexShader);
             RenderSystem.setShaderTexture(0, anvilIcon);
             RenderSystem.enableBlend();
