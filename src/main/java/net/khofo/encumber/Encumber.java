@@ -46,12 +46,12 @@ public class Encumber {
     private static final Logger LOGGER = LogUtils.getLogger();
 
     static {
-        defaultCategoryWeights.put("weapons", 5.0);
-        defaultCategoryWeights.put("armor", 8.0);
-        defaultCategoryWeights.put("tools", 4.0);
-        defaultCategoryWeights.put("resources", 3.0);
-        defaultCategoryWeights.put("consumables", 1.0);
-        defaultCategoryWeights.put("miscellaneous", 2.0);
+        defaultCategoryWeights.put("weapons", 2.0);
+        defaultCategoryWeights.put("armor", 12.0);
+        defaultCategoryWeights.put("tools", 3.0);
+        defaultCategoryWeights.put("resources", 8.0);
+        defaultCategoryWeights.put("consumables", 0.25);
+        defaultCategoryWeights.put("miscellaneous", 1.0);
     }
     public Encumber()
     {
@@ -137,7 +137,7 @@ public class Encumber {
             return defaultCategoryWeights.get("armor");
         } else if (item instanceof PickaxeItem || item instanceof ShovelItem || item instanceof HoeItem) {
             return defaultCategoryWeights.get("tools");
-        } else if (item == Items.IRON_INGOT || item == Items.GOLD_INGOT || item == Items.DIAMOND || item == Items.EMERALD) {
+        } else if (ForgeRegistries.ITEMS.getKey(item).toString().contains("ingot")) {
             return defaultCategoryWeights.get("resources");
         } else if (item.isEdible()) {
             return defaultCategoryWeights.get("consumables");

@@ -17,6 +17,9 @@ import net.minecraftforge.client.event.RenderGuiOverlayEvent;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+
 public class WeightOverlay {
     private static final ResourceLocation ANVIL_ICON_WHITE = new ResourceLocation(Encumber.MOD_ID, "textures/gui/anvil_icon_white.png");
     private static final ResourceLocation ANVIL_ICON_YELLOW = new ResourceLocation(Encumber.MOD_ID, "textures/gui/anvil_icon_yellow.png");
@@ -34,7 +37,7 @@ public class WeightOverlay {
             GuiGraphics guiGraphics = event.getGuiGraphics();
             PoseStack poseStack = guiGraphics.pose();
             double weight = WeightEvent.calculateWeight(minecraft.player);
-            String weightText = "Weight: " + weight + "/" + Math.abs(WeightEvent.getWeightWithBoostItem(minecraft.player, 1));
+            String weightText = "Weight: " + roundDouble(weight, 3) + "/" + Math.abs(WeightEvent.getWeightWithBoostItem(minecraft.player, 1));
 
             // Render the weight text on the screen
             poseStack.pushPose();
@@ -66,7 +69,7 @@ public class WeightOverlay {
             if (WeightEvent.getThresholdTF(Configs.TOGGLE_ANVIL_ICON) && (weight >= WeightEvent.getWeightWithBoostItem(minecraft.player,1))) {
                 // Add jiggle logic
                 long tickCount = minecraft.level.getGameTime();
-                if (tickCount % (Math.max(1, 24) * 3 + 1) == 0) {
+                if (tickCount % (Math.max(1, 2) * 3 + 1) == 0) {
                     icon_y += (random.nextInt(1) - 1); // Random jiggle of -1, 0, or 1
                 }
             }
@@ -99,5 +102,13 @@ public class WeightOverlay {
             }
             poseStack.popPose();
         }
+    }
+
+    public static double roundDouble(double value, int places) {
+        if (places < 0) throw new IllegalArgumentException();
+
+        BigDecimal bd = BigDecimal.valueOf(value);
+        bd = bd.setScale(places, RoundingMode.HALF_UP);
+        return bd.doubleValue();
     }
 }
