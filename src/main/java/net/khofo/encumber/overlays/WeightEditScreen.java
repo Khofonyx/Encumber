@@ -2,13 +2,15 @@ package net.khofo.encumber.overlays;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.client.gui.components.Button;
 
 public class WeightEditScreen extends Screen {
-    private static final ResourceLocation GUI_TEXTURE = new ResourceLocation("encumber", "textures/gui/inventory.png");
+    private static final ResourceLocation GUI_TEXTURE = new ResourceLocation("encumber", "textures/gui/inventory_background.png");
 
     public WeightEditScreen(Component title) {
         super(title);
@@ -17,7 +19,17 @@ public class WeightEditScreen extends Screen {
     @Override
     protected void init() {
         super.init();
-        // Initialize buttons and fields here
+
+        // Add a button that exits the screen
+        int x = (this.width - 226) / 2;
+        int y = (this.height - 226) / 2;
+        this.addRenderableWidget(new Button.Builder(Component.literal("Exit"), button -> {
+            this.onClose();
+        })
+        .pos(x +93, y+200)
+        .size(40, 16)
+        .build());
+
     }
 
     @Override
@@ -30,9 +42,9 @@ public class WeightEditScreen extends Screen {
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
 
         // Draw the entire 128x128 texture centered on the screen
-        int x = (this.width - 128) / 2;
-        int y = (this.height - 128) / 2;
-        guiGraphics.blit(GUI_TEXTURE, x, y, 0, 0, 128, 128, 128, 128);
+        int x = (this.width - 226) / 2;
+        int y = (this.height - 226) / 2;
+        guiGraphics.blit(GUI_TEXTURE, x, y, 0, 0, 226, 226, 226, 226);
 
         RenderSystem.disableBlend();
         super.render(guiGraphics, mouseX, mouseY, partialTicks);
