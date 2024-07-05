@@ -1,5 +1,7 @@
 package net.khofo.encumber.groups;
 
+import net.khofo.encumber.overlays.BaseItem;
+import net.khofo.encumber.overlays.Group;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.*;
 import net.minecraftforge.registries.ForgeRegistries;
@@ -7,13 +9,70 @@ import net.minecraftforge.registries.ForgeRegistries;
 import java.util.*;
 
 public class ItemGroups {
+
+    public static Group rootGroup = new Group("Minecraft", 0.0);
     public static final Map<String, List<Item>> groups = new HashMap<>();
 
     static {
         generateGroups();
+        // Initialize the root group and its subgroups/items
+    }
+
+    public static void initGroup(Group rootGroup) {
+        // Create some base items
+        BaseItem item1 = new BaseItem("Planks", 1.5);
+        BaseItem item2 = new BaseItem("Doors", 2.0);
+        BaseItem item3 = new BaseItem("Slabs", 1.2);
+        BaseItem item4 = new BaseItem("Bricks", 3.4);
+        BaseItem item5 = new BaseItem("Tiles", 1.1);
+        BaseItem item6 = new BaseItem("Windows", 2.5);
+        BaseItem item7 = new BaseItem("Tables", 4.0);
+        BaseItem item8 = new BaseItem("Chairs", 3.0);
+
+        // Create some subgroups
+        Group subGroup1 = new Group("Wood", 0.0);
+        Group subGroup2 = new Group("Stone", 0.0);
+        Group subGroup3 = new Group("Metal", 0.0);
+        Group subGroup4 = new Group("Furniture", 0.0);
+
+        // Nested subgroups
+        Group subSubGroup1 = new Group("Softwood", 0.0);
+        Group subSubGroup2 = new Group("Hardwood", 0.0);
+        Group subSubGroup3 = new Group("Decor", 0.0);
+
+        // Add base items to nested subgroups
+        subSubGroup1.addSubGroup(item1); // Softwood -> Planks
+        subSubGroup1.addSubGroup(item2); // Softwood -> Doors
+        subSubGroup2.addSubGroup(item3); // Hardwood -> Slabs
+        subSubGroup2.addSubGroup(item4); // Hardwood -> Bricks
+
+        subSubGroup3.addSubGroup(item5); // Decor -> Tiles
+        subSubGroup3.addSubGroup(item6); // Decor -> Windows
+
+        // Add nested subgroups to subgroups
+        subGroup1.addSubGroup(subSubGroup1); // Wood -> Softwood
+        subGroup1.addSubGroup(subSubGroup2); // Wood -> Hardwood
+
+        subGroup4.addSubGroup(subSubGroup3); // Furniture -> Decor
+        subGroup4.addSubGroup(item7); // Furniture -> Tables
+        subGroup4.addSubGroup(item8); // Furniture -> Chairs
+
+        // Add base items directly to subgroups
+        subGroup2.addSubGroup(new BaseItem("Granite", 2.8));
+        subGroup2.addSubGroup(new BaseItem("Marble", 3.6));
+
+        subGroup3.addSubGroup(new BaseItem("Iron", 7.2));
+        subGroup3.addSubGroup(new BaseItem("Copper", 6.8));
+
+        // Add subgroups to root group
+        rootGroup.addSubGroup(subGroup1); // Root -> Wood
+        rootGroup.addSubGroup(subGroup2); // Root -> Stone
+        rootGroup.addSubGroup(subGroup3); // Root -> Metal
+        rootGroup.addSubGroup(subGroup4); // Root -> Furniture
     }
 
     private static void generateGroups() {
+        initGroup(rootGroup);
         groups.put("CARPETS", new ArrayList<>());
         groups.put("ARMORS", new ArrayList<>());
         groups.put("STAIRS", new ArrayList<>());

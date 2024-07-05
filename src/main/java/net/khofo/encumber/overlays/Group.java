@@ -4,64 +4,58 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Group implements GroupItem {
-    private String name;
-    private double weight;
-    private boolean uiClosed;
-    private List<GroupItem> subGroups;  // List of GroupItem
-    private int depth = 1;
+    private final String name;
+    private final double weight;
+    private final List<GroupItem> subGroups;
+    private boolean expanded;
 
-    // Constructor
-    public Group(String name, double weight, boolean uiClosed) {
+    public Group(String name, double weight) {
         this.name = name;
         this.weight = weight;
-        this.uiClosed = uiClosed;
         this.subGroups = new ArrayList<>();
+        this.expanded = false;
     }
 
-    // Getters and Setters
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String groupName) {
-        this.name= groupName;
-    }
-
-    public double getWeight() {
-        return weight;
-    }
-
-    public void setWeight(double weight) {
-        this.weight = weight;
-    }
-
-    public boolean isUIClosed() {
-        return uiClosed;
-    }
-
-    public void setUIClosed(boolean uiClosed) {
-        this.uiClosed = uiClosed;
+    public void addSubGroup(GroupItem subGroup) {
+        subGroups.add(subGroup);
     }
 
     public List<GroupItem> getSubGroups() {
         return subGroups;
     }
 
-    public void setSubGroups(List<GroupItem> subGroups) {
-        this.subGroups = subGroups;
+    public boolean isExpanded() {
+        return expanded;
     }
 
-    // Add a subgroup
-    public void addSubGroup(GroupItem subGroup) {
-        depth++;
-        this.subGroups.add(subGroup);
+    public void toggleExpanded() {
+        this.expanded = !this.expanded;
+        if (!this.expanded) {
+            // Collapse all child groups
+            collapseChildren(this);
+        }
     }
 
-    public int getDepth(){
-        return depth;
+    private void collapseChildren(Group group) {
+        for (GroupItem child : group.getSubGroups()) {
+            if (child instanceof Group) {
+                ((Group) child).setExpanded(false);
+                collapseChildren((Group) child);
+            }
+        }
     }
 
-    public void setDepth(int depth){
-        this.depth =  depth;
+    private void setExpanded(boolean expanded) {
+        this.expanded = expanded;
+    }
+
+    @Override
+    public double getWeight() {
+        return weight;
+    }
+
+    @Override
+    public String getName() {
+        return name;
     }
 }
