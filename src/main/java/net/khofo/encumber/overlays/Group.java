@@ -5,7 +5,7 @@ import java.util.List;
 
 public class Group implements GroupItem {
     private final String name;
-    private final double weight;
+    private double weight;
     private final List<GroupItem> subGroups;
     private boolean expanded;
 
@@ -52,6 +52,10 @@ public class Group implements GroupItem {
     @Override
     public double getWeight() {
         return weight;
+    }
+
+    public void setWeight(double weight) {
+        this.weight = weight;
     }
 
     @Override

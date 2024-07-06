@@ -3,7 +3,7 @@ package net.khofo.encumber.overlays;
 
 public class BaseItem implements GroupItem {
     private final String name;
-    private final double weight;
+    private double weight;
 
     public BaseItem(String name, double weight) {
         this.name = name;
@@ -14,6 +14,12 @@ public class BaseItem implements GroupItem {
     public double getWeight() {
         return weight;
     }
+
+
+    public void setWeight(double weight) {
+        this.weight = weight;
+    }
+
 
     @Override
     public String getName() {

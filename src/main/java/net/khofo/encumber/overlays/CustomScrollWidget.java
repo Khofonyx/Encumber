@@ -45,7 +45,7 @@ public class CustomScrollWidget extends AbstractScrollWidget {
         int indent = 20;
 
         for (DropdownMenu menu : dropdownMenus) {
-            y = menu.render(this.getX(), y, this.getX() + 200, indent, pGuiGraphics);
+            y = menu.render(this.getX(), y, this.getX() + 165, indent, pGuiGraphics, scrollAmount);
         }
     }
 
@@ -55,6 +55,11 @@ public class CustomScrollWidget extends AbstractScrollWidget {
         int indent = 0;
 
         for (DropdownMenu menu : dropdownMenus) {
+            Group group = menu.getGroup();
+            if (GroupUI.mouseClicked(group, mouseX, mouseY, button, this.scrollAmount())) {
+                return true;
+            }
+
             if (menu.mouseClicked(mouseX, mouseY, this.getX(), y, indent, this.scrollAmount())) {
                 return true;
             }
@@ -94,21 +99,29 @@ public class CustomScrollWidget extends AbstractScrollWidget {
         if (!this.visible) {
             return false;
         } else {
-            System.out.println("Original Scroll Amount: " + this.scrollAmount());
-            System.out.println("pDelta: " + pDelta);
+            //System.out.println("Original Scroll Amount: " + this.scrollAmount());
+            //System.out.println("pDelta: " + pDelta);
             this.setScrollAmount(this.scrollAmount() - (pDelta * this.scrollRate()));
-            System.out.println("New Scroll Amount: " + this.scrollAmount());
+            //System.out.println("New Scroll Amount: " + this.scrollAmount());
             return true;
         }
     }
 
+    @Override
     public boolean keyPressed(int pKeyCode, int pScanCode, int pModifiers) {
         boolean flag = pKeyCode == 265;
         boolean flag1 = pKeyCode == 264;
         if (flag || flag1) {
             double d0 = this.scrollAmount;
-            this.setScrollAmount(this.scrollAmount + (double)(flag ? -1 : 1) * this.scrollRate());
+            this.setScrollAmount(this.scrollAmount + (double) (flag ? -1 : 1) * this.scrollRate());
             if (d0 != this.scrollAmount) {
+                return true;
+            }
+        }
+
+        for (DropdownMenu menu : dropdownMenus) {
+            Group group = menu.getGroup();
+            if (GroupUI.keyPressed(group, pKeyCode, pScanCode, pModifiers)) {
                 return true;
             }
         }
@@ -206,6 +219,23 @@ public class CustomScrollWidget extends AbstractScrollWidget {
     @Override
     protected void updateWidgetNarration(NarrationElementOutput pNarrationElementOutput) {
         // Provide a narration for the widget if needed
+    }
+
+    @Override
+    public boolean charTyped(char chr, int modifiers) {
+        for (DropdownMenu menu : dropdownMenus) {
+            Group group = menu.getGroup();
+            if (GroupUI.charTyped(group, chr, modifiers)) {
+                return true;
+            }
+        }
+        return super.charTyped(chr, modifiers);
+    }
+
+    public void tick() {
+        for (DropdownMenu menu : dropdownMenus) {
+            menu.tick();
+        }
     }
 }
 /*public class CustomScrollWidget extends AbstractScrollWidget {

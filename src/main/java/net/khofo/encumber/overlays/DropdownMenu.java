@@ -14,13 +14,13 @@ public class DropdownMenu {
         return group;
     }
 
-    public int render(int x, int y, int weightX, int indent, GuiGraphics guiGraphics) {
-        return GroupUI.renderGroup(group, x, y, weightX, indent, guiGraphics);
+    public int render(int x, int y, int weightX, int indent, GuiGraphics guiGraphics, double scrollAmount) {
+        return GroupUI.renderGroup(group, x, y, weightX, indent, guiGraphics, scrollAmount);
     }
 
     public boolean mouseClicked(double mouseX, double mouseY, int x, int y, int indent, double scrollAmount) {
         int titleHeight = 20;
-        int maxClickableWidth = 200 - indent;
+        int maxClickableWidth = 160 - indent;
 
         if ((mouseX >= x) && (mouseX <= x + maxClickableWidth) && (mouseY >= y - scrollAmount) && (mouseY <= y - scrollAmount + titleHeight)) {
             group.toggleExpanded();
@@ -58,5 +58,9 @@ public class DropdownMenu {
             }
         }
         return height;
+    }
+
+    public void tick() {
+        GroupUI.tickGroup(group);
     }
 }

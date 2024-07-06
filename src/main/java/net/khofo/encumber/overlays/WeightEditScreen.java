@@ -75,7 +75,24 @@ public class WeightEditScreen extends Screen {
     }
 
     @Override
+    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+        if (customScrollWidget.keyPressed(keyCode, scanCode, modifiers)) {
+            return true;
+        }
+        return super.keyPressed(keyCode, scanCode, modifiers);
+    }
+
+    @Override
+    public boolean charTyped(char chr, int modifiers) {
+        if (customScrollWidget.charTyped(chr, modifiers)) {
+            return true;
+        }
+        return super.charTyped(chr, modifiers);
+    }
+
+    @Override
     public void tick() {
         super.tick();
+        customScrollWidget.tick(); // Ensure customScrollWidget tick method is called
     }
 }
