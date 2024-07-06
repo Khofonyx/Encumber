@@ -20,14 +20,14 @@ public class ItemGroups {
 
     public static void initGroup(Group rootGroup) {
         // Create some base items
-        BaseItem item1 = new BaseItem("Planks", 1.5);
-        BaseItem item2 = new BaseItem("Doors", 2.0);
-        BaseItem item3 = new BaseItem("Slabs", 1.2);
-        BaseItem item4 = new BaseItem("Bricks", 3.4);
-        BaseItem item5 = new BaseItem("Tiles", 1.1);
-        BaseItem item6 = new BaseItem("Windows", 2.5);
-        BaseItem item7 = new BaseItem("Tables", 4.0);
-        BaseItem item8 = new BaseItem("Chairs", 3.0);
+        BaseItem item1 = new BaseItem("diamond_hoe", 1.5);
+        BaseItem item2 = new BaseItem("diamond_axe", 2.0);
+        BaseItem item3 = new BaseItem("diamond", 1.2);
+        BaseItem item4 = new BaseItem("diamond_helmet", 3.4);
+        BaseItem item5 = new BaseItem("diamond_boots", 1.1);
+        BaseItem item6 = new BaseItem("diamond_leggings", 2.5);
+        BaseItem item7 = new BaseItem("diamond_chestplate", 4.0);
+        BaseItem item8 = new BaseItem("diamond_pickaxe", 3.0);
 
         // Create some subgroups
         Group subGroup1 = new Group("Wood", 0.0);
@@ -58,11 +58,11 @@ public class ItemGroups {
         subGroup4.addSubGroup(item8); // Furniture -> Chairs
 
         // Add base items directly to subgroups
-        subGroup2.addSubGroup(new BaseItem("Granite", 2.8));
-        subGroup2.addSubGroup(new BaseItem("Marble", 3.6));
+        subGroup2.addSubGroup(new BaseItem("granite", 2.8));
+        //subGroup2.addSubGroup(new BaseItem("Marble", 3.6));
 
-        subGroup3.addSubGroup(new BaseItem("Iron", 7.2));
-        subGroup3.addSubGroup(new BaseItem("Copper", 6.8));
+        //subGroup3.addSubGroup(new BaseItem("Iron", 7.2));
+        //subGroup3.addSubGroup(new BaseItem("Copper", 6.8));
 
         // Add subgroups to root group
         rootGroup.addSubGroup(subGroup1); // Root -> Wood

@@ -1,9 +1,18 @@
 package net.khofo.encumber.overlays;
 
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.math.Axis;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.entity.ItemRenderer;
+import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.network.chat.Component;
+import net.minecraft.world.item.ItemDisplayContext;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+
 
 import java.util.HashMap;
 import java.util.Map;
@@ -12,10 +21,13 @@ public class BaseItemUI {
     private static final Map<BaseItem, CustomEditBox> editBoxMap = new HashMap<>();
     public static int renderBaseItem(BaseItem item, int x, int y, int weightX, GuiGraphics guiGraphics, double scrollAmount) {
         Font font = Minecraft.getInstance().font;
+        ItemRenderer itemRenderer = Minecraft.getInstance().getItemRenderer();
 
         // Render the base item row
-        guiGraphics.drawString(font, item.getName(), x, y, 0xFFFFFF);
+        guiGraphics.drawString(font, item.getName(), x + 20, y, 0xFFFFFF);
 
+        // Render the item icon
+        guiGraphics.renderItem(item.getItemStack(),x,y);
 
         // Get or create the CustomEditBox for this base item
         CustomEditBox weightField = editBoxMap.computeIfAbsent(item, i -> {
@@ -33,6 +45,11 @@ public class BaseItemUI {
         // Return the new y position for the next element
         return y + 20;
     }
+
+    private static int getCombinedLight(int blockLight, int skyLight) {
+        return (skyLight << 20) | (blockLight << 4);
+    }
+
 
     public static boolean mouseClicked(BaseItem item, double mouseX, double mouseY, int button, double scrollAmount) {
         unfocusAll();
