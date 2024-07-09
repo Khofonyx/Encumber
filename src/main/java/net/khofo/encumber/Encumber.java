@@ -68,9 +68,6 @@ public class Encumber {
     }
 
     private void commonSetup(final FMLCommonSetupEvent event) {
-        System.out.println("Container Items: " + Configs.CONTAINERS.get());
-        System.out.println("Boost Items: " + Configs.BOOST_ITEMS.get());
-        System.out.println("Boost Amount: " + Configs.BOOST_AMOUNT.get());
         loadItemWeights();
         MinecraftForge.EVENT_BUS.register(WeightCommands.class);
     }

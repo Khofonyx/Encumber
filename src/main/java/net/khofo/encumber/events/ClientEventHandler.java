@@ -15,12 +15,11 @@ import org.lwjgl.glfw.GLFW;
 
 @Mod.EventBusSubscriber(modid = "encumber", bus = Mod.EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
 public class ClientEventHandler {
-
     // Define the key mapping
     private static final KeyMapping OPEN_WEIGHT_EDIT_SCREEN_KEY = new KeyMapping(
-            "key.weightmod.open_weight_edit_screen",
+            "key.encumber.open_weight_edit_screen",
             GLFW.GLFW_KEY_G,
-            "key.categories.misc"
+            "key.categories.encumber"
     );
 
     @SubscribeEvent
