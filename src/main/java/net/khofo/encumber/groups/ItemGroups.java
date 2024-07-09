@@ -1,5 +1,6 @@
 package net.khofo.encumber.groups;
 
+import net.khofo.encumber.Encumber;
 import net.khofo.encumber.overlays.BaseItem;
 import net.khofo.encumber.overlays.Group;
 import net.minecraft.resources.ResourceLocation;
@@ -7,6 +8,7 @@ import net.minecraft.world.item.*;
 import net.minecraftforge.registries.ForgeRegistries;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class ItemGroups {
 
@@ -19,56 +21,22 @@ public class ItemGroups {
     }
 
     public static void initGroup(Group rootGroup) {
-        // Create some base items
-        BaseItem item1 = new BaseItem("diamond_hoe", 1.5);
-        BaseItem item2 = new BaseItem("diamond_axe", 2.0);
-        BaseItem item3 = new BaseItem("diamond", 1.2);
-        BaseItem item4 = new BaseItem("diamond_helmet", 3.4);
-        BaseItem item5 = new BaseItem("diamond_boots", 1.1);
-        BaseItem item6 = new BaseItem("diamond_leggings", 2.5);
-        BaseItem item7 = new BaseItem("diamond_chestplate", 4.0);
-        BaseItem item8 = new BaseItem("diamond_pickaxe", 3.0);
+        // Access the existing item weights map
+        Map<ResourceLocation, Double> items = Encumber.itemWeights;
 
-        // Create some subgroups
-        Group subGroup1 = new Group("Wood", 0.0);
-        Group subGroup2 = new Group("Stone", 0.0);
-        Group subGroup3 = new Group("Metal", 0.0);
-        Group subGroup4 = new Group("Furniture", 0.0);
+        // Convert the map entries to a list and sort them alphabetically by item name
+        List<Map.Entry<ResourceLocation, Double>> sortedItems = items.entrySet()
+                .stream()
+                .sorted(Map.Entry.comparingByKey((a, b) -> a.toString().compareTo(b.toString())))
+                .collect(Collectors.toList());
 
-        // Nested subgroups
-        Group subSubGroup1 = new Group("Softwood", 0.0);
-        Group subSubGroup2 = new Group("Hardwood", 0.0);
-        Group subSubGroup3 = new Group("Decor", 0.0);
-
-        // Add base items to nested subgroups
-        subSubGroup1.addSubGroup(item1); // Softwood -> Planks
-        subSubGroup1.addSubGroup(item2); // Softwood -> Doors
-        subSubGroup2.addSubGroup(item3); // Hardwood -> Slabs
-        subSubGroup2.addSubGroup(item4); // Hardwood -> Bricks
-
-        subSubGroup3.addSubGroup(item5); // Decor -> Tiles
-        subSubGroup3.addSubGroup(item6); // Decor -> Windows
-
-        // Add nested subgroups to subgroups
-        subGroup1.addSubGroup(subSubGroup1); // Wood -> Softwood
-        subGroup1.addSubGroup(subSubGroup2); // Wood -> Hardwood
-
-        subGroup4.addSubGroup(subSubGroup3); // Furniture -> Decor
-        subGroup4.addSubGroup(item7); // Furniture -> Tables
-        subGroup4.addSubGroup(item8); // Furniture -> Chairs
-
-        // Add base items directly to subgroups
-        subGroup2.addSubGroup(new BaseItem("granite", 2.8));
-        //subGroup2.addSubGroup(new BaseItem("Marble", 3.6));
-
-        //subGroup3.addSubGroup(new BaseItem("Iron", 7.2));
-        //subGroup3.addSubGroup(new BaseItem("Copper", 6.8));
-
-        // Add subgroups to root group
-        rootGroup.addSubGroup(subGroup1); // Root -> Wood
-        rootGroup.addSubGroup(subGroup2); // Root -> Stone
-        rootGroup.addSubGroup(subGroup3); // Root -> Metal
-        rootGroup.addSubGroup(subGroup4); // Root -> Furniture
+        // Iterate through the sorted items and add them to the main subgroup
+        for (Map.Entry<ResourceLocation, Double> entry : sortedItems) {
+            ResourceLocation itemName = entry.getKey();
+            Double itemWeight = entry.getValue();
+            BaseItem baseItem = new BaseItem(itemName.toString(), itemWeight);
+            rootGroup.addSubGroup(baseItem);
+        }
     }
 
     private static void generateGroups() {

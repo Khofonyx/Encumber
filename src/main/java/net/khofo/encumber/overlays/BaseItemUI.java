@@ -2,6 +2,7 @@ package net.khofo.encumber.overlays;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
+import net.khofo.encumber.Encumber;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
@@ -9,6 +10,7 @@ import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.entity.ItemRenderer;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
@@ -24,7 +26,7 @@ public class BaseItemUI {
         ItemRenderer itemRenderer = Minecraft.getInstance().getItemRenderer();
 
         // Render the base item row
-        guiGraphics.drawString(font, item.getName(), x + 20, y, 0xFFFFFF);
+        renderItemName(guiGraphics,font,item,x,y);
 
         // Render the item icon
         guiGraphics.renderItem(item.getItemStack(),x,y);
@@ -44,6 +46,18 @@ public class BaseItemUI {
 
         // Return the new y position for the next element
         return y + 20;
+    }
+
+    public static void renderItemName(GuiGraphics guiGraphics, Font font, BaseItem item, int x, int y) {
+        String itemName = item.getName();
+
+        // Remove the "minecraft:" prefix if present
+        if (itemName.startsWith("minecraft:")) {
+            itemName = itemName.substring(10); // Remove the first 10 characters
+        }
+
+        // Render the item name
+        guiGraphics.drawString(font, itemName, x + 20, y, 0xFFFFFF);
     }
 
     private static int getCombinedLight(int blockLight, int skyLight) {
@@ -77,6 +91,12 @@ public class BaseItemUI {
             try {
                 double newWeight = Double.parseDouble(weightField.getValue());
                 item.setWeight(newWeight);
+
+                // Update the item weight in the Encumber.itemWeights map
+                ResourceLocation itemName = new ResourceLocation(item.getName());
+                Encumber.itemWeights.put(itemName, newWeight);
+                Encumber.updateConfigWeights(); // Assuming this method updates the config file
+
                 System.out.println("CustomEditBox charTyped: " + item.getName() + ", New Weight: " + newWeight);
             } catch (NumberFormatException e) {
                 // Handle invalid input if necessary

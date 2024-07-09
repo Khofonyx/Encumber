@@ -1,12 +1,14 @@
 package net.khofo.encumber.overlays;
 
 import com.mojang.blaze3d.systems.RenderSystem;
+import net.khofo.encumber.Encumber;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -109,7 +111,15 @@ public class GroupUI {
         if (weightField != null && weightField.isFocused() && weightField.charTyped(chr, modifiers)) {
             try {
                 double newWeight = Double.parseDouble(weightField.getValue());
-                group.setWeight(newWeight);
+
+                // If the group is not expanded, update the group's weight and the weights of all items in its subgroups
+                if (!group.isExpanded()) {
+                    group.setWeight(newWeight);
+                    setWeightsForSubGroups(group, newWeight);
+                } else {
+                    group.setWeight(newWeight);
+                }
+
                 System.out.println("CustomEditBox charTyped: " + group.getName() + ", New Weight: " + newWeight);
             } catch (NumberFormatException e) {
                 // Handle invalid input if necessary
@@ -132,7 +142,28 @@ public class GroupUI {
                 }
             }
         }
+
         return false;
+    }
+
+    private static void setWeightsForSubGroups(Group group, double newWeight) {
+        for (GroupItem subGroup : group.getSubGroups()) {
+            if (subGroup instanceof BaseItem) {
+                ((BaseItem) subGroup).setWeight(newWeight);
+
+                // Update the item weight in the Encumber.itemWeights map
+                ResourceLocation itemName = new ResourceLocation(((BaseItem) subGroup).getName());
+                Encumber.itemWeights.put(itemName, newWeight);
+            } else if (subGroup instanceof Group) {
+                ((Group) subGroup).setWeight(newWeight);
+
+                // Recursively set weights for subgroups
+                setWeightsForSubGroups((Group) subGroup, newWeight);
+            }
+        }
+
+        // Persist the updated weights
+        Encumber.updateConfigWeights();
     }
 
     public static void tickGroup(Group group) {

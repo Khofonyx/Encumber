@@ -4,6 +4,7 @@ import net.minecraftforge.common.ForgeConfigSpec;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.function.Predicate;
 
 public class Configs {
     public static final ForgeConfigSpec.Builder BUILDER = new ForgeConfigSpec.Builder();
@@ -27,25 +28,29 @@ public class Configs {
     static {
         BUILDER.push("Configs for Encumbered:");
 
-        CONTAINERS = BUILDER.comment("\nWhich container items should be checked?")
-                .define("container_item", Arrays.asList(
+        // Define predicates for the list elements
+        Predicate<Object> stringValidator = obj -> obj instanceof String;
+        Predicate<Object> doubleValidator = obj -> obj instanceof Double;
+
+        CONTAINERS = (ForgeConfigSpec.ConfigValue<List<String>>) (Object) BUILDER.comment("\nWhich container items should be checked?")
+                .defineListAllowEmpty("container_item", Arrays.asList(
                         "minecraft:shulker_box", "minecraft:white_shulker_box", "minecraft:orange_shulker_box",
                         "minecraft:magenta_shulker_box", "minecraft:light_blue_shulker_box", "minecraft:yellow_shulker_box",
                         "minecraft:lime_shulker_box", "minecraft:pink_shulker_box", "minecraft:gray_shulker_box",
                         "minecraft:light_gray_shulker_box", "minecraft:cyan_shulker_box", "minecraft:purple_shulker_box",
                         "minecraft:blue_shulker_box", "minecraft:brown_shulker_box", "minecraft:green_shulker_box",
-                        "minecraft:red_shulker_box", "minecraft:black_shulker_box"));
+                        "minecraft:red_shulker_box", "minecraft:black_shulker_box"), stringValidator);
 
-        BOOST_ITEMS = BUILDER.comment("\nAdd any items you want to boost the player's carrying capacity")
-                .define("boost_items", Arrays.asList("minecraft:diamond_helmet","minecraft:emerald"));
+        BOOST_ITEMS = (ForgeConfigSpec.ConfigValue<List<String>>) (Object) BUILDER.comment("\nAdd any items you want to boost the player's carrying capacity")
+                .defineListAllowEmpty("boost_items", Arrays.asList("minecraft:diamond_helmet", "minecraft:emerald"), stringValidator);
 
-        BOOST_AMOUNT = BUILDER.comment("\nAdd boost amounts that correspond to the BOOST_ITEMS above")
-                .define("boost_amount", Arrays.asList(100.0D,1000.0D));
+        BOOST_AMOUNT = (ForgeConfigSpec.ConfigValue<List<Double>>) (Object) BUILDER.comment("\nAdd boost amounts that correspond to the BOOST_ITEMS above")
+                .defineListAllowEmpty("boost_amount", Arrays.asList(100.0D, 1000.0D), doubleValidator);
 
-        RIDING_FLYING_JUMPING_TIED_TO_OVER_ENCUMBERED_THRESHOLD = BUILDER.comment("\nIf this is true, when they player is at the OVER_ENCUMBERED_THRESHOLD, they cannot jump, fly, or ride mounts. If false, you can configure these thresholds below. default: true")
+        RIDING_FLYING_JUMPING_TIED_TO_OVER_ENCUMBERED_THRESHOLD = BUILDER.comment("\nIf this is true, when the player is at the OVER_ENCUMBERED_THRESHOLD, they cannot jump, fly, or ride mounts. If false, you can configure these thresholds below. default: true")
                 .define("tie_to_over_encumbered_threshold", true);
 
-        RIDING_THRESHOLD = BUILDER.comment("\n weight is above this, you cannot ride any mount (Negative values will break the mod) default: 100")
+        RIDING_THRESHOLD = BUILDER.comment("\nIf weight is above this, you cannot ride any mount (Negative values will break the mod) default: 100")
                 .define("riding_threshold", 100.0D);
 
         FALL_FLYING_THRESHOLD = BUILDER.comment("\nIf weight is above this, you cannot fly with an elytra (Negative values will break the mod) default: 100")
@@ -69,7 +74,7 @@ public class Configs {
         ALLOW_MULTIPLE_BOOST_ITEMS = BUILDER.comment("\nWhether or not boost item's additional capacities stack. If there are multiple boost items present in your inventory and this is false, it chooses the better boost item. default: false")
                 .define("allow_multiple_boost_items", false);
 
-        SINK_IN_WATER_LAVA = BUILDER.comment("\nWhether or not the player sinks in WATER and LAVA while OVER_ENCUBMERED. default: true")
+        SINK_IN_WATER_LAVA = BUILDER.comment("\nWhether or not the player sinks in WATER and LAVA while OVER_ENCUMBERED. default: true")
                 .define("sink_in_water_and_lava", true);
 
         TOGGLE_ANVIL_ICON = BUILDER.comment("\nWhether or not the anvil icon appears. default: true")
