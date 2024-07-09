@@ -22,7 +22,7 @@ public class GroupUI {
         drawHitbox(guiGraphics, x, y, 200 - indent, 20, 0x55FF0000); // Red color, adjusted for indent
 
         // Render the group row
-        guiGraphics.drawString(font, group.getName(), x, y, 0xFFFFFF);
+        guiGraphics.drawString(font, group.getName(), x + 5, y + 5, 0xFFFFFF);
 
         // Get or create the CustomEditBox for this group
         CustomEditBox weightField = editBoxMap.computeIfAbsent(group, g -> {

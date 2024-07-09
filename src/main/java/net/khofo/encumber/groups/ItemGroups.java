@@ -61,7 +61,6 @@ public class ItemGroups {
         groups.put("STONES", new ArrayList<>());
         groups.put("SOILS", new ArrayList<>());
         groups.put("PLANTS", new ArrayList<>());
-        groups.put("EGGS", new ArrayList<>());
         groups.put("SIGNS", new ArrayList<>());
         groups.put("GLASS_PANES", new ArrayList<>());
         groups.put("GLASS", new ArrayList<>());
@@ -69,6 +68,10 @@ public class ItemGroups {
         groups.put("CANDLES", new ArrayList<>());
         groups.put("BEDS", new ArrayList<>());
         groups.put("SHULKER_BOXES", new ArrayList<>());
+        groups.put("EGGS", new ArrayList<>());
+
+        //Spawn eggs
+        //
 
 
 

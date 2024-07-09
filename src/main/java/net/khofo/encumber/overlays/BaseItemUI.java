@@ -1,5 +1,6 @@
 package net.khofo.encumber.overlays;
 
+import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
 import net.khofo.encumber.Encumber;
@@ -25,8 +26,9 @@ public class BaseItemUI {
         Font font = Minecraft.getInstance().font;
         ItemRenderer itemRenderer = Minecraft.getInstance().getItemRenderer();
 
+
         // Render the base item row
-        renderItemName(guiGraphics,font,item,x,y);
+        renderItemName(guiGraphics,font,item,x,y+5);
 
         // Render the item icon
         guiGraphics.renderItem(item.getItemStack(),x,y);
