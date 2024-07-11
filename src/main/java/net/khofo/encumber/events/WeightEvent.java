@@ -15,6 +15,7 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.animal.Pig;
 import net.minecraft.world.entity.animal.horse.AbstractHorse;
@@ -23,6 +24,7 @@ import net.minecraft.world.entity.monster.Strider;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.vehicle.AbstractMinecart;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.common.ForgeConfigSpec;
@@ -90,15 +92,40 @@ public class WeightEvent {
         }
     }
 
-    public static double getWeightWithBoostItem(Player player, int slownessLevel){
-        double retWeight = 0.0;
-        if (slownessLevel == 0){
-            retWeight = getThreshold(Configs.ENCUMBERED_THRESHOLD) + getBoostItemAmount(player);
+    public static double getWeightWithBoostItem(Player player, int slownessLevel) {
+        double baseThreshold = 0.0;
+
+        if (slownessLevel == 0) {
+            baseThreshold = getThreshold(Configs.ENCUMBERED_THRESHOLD);
+        } else if (slownessLevel == 1) {
+            baseThreshold = getThreshold(Configs.OVER_ENCUMBERED_THRESHOLD);
         }
-        if(slownessLevel == 1){
-            retWeight = getThreshold(Configs.OVER_ENCUMBERED_THRESHOLD) + getBoostItemAmount(player);
+
+        // Add the boost item amount to the base threshold
+        double totalWeight = baseThreshold + getBoostItemAmount(player);
+
+        // Get the player's leggings item
+        ItemStack leggings = player.getItemBySlot(EquipmentSlot.LEGS);
+        if (leggings.isEnchanted()) {
+            // Check if the leggings have the Unencumberment enchantment
+            int enchantmentLevel = EnchantmentHelper.getItemEnchantmentLevel(Encumber.UNENCUMBERMENT.get(), leggings);
+            if (enchantmentLevel > 0) {
+                // Apply the appropriate multiplier based on the enchantment level
+                double multiplier = getCarryingCapacityBoost(enchantmentLevel);
+                totalWeight *= multiplier;
+            }
         }
-        return retWeight;
+
+        return totalWeight;
+    }
+
+    private static double getCarryingCapacityBoost(int level) {
+        return switch (level) {
+            case 1 -> Configs.UNENCUMBERMENT_LEVEL1_MULTIPLIER.get();
+            case 2 -> Configs.UNENCUMBERMENT_LEVEL2_MULTIPLIER.get();
+            case 3 -> Configs.UNENCUMBERMENT_LEVEL3_MULTIPLIER.get();
+            default -> 1.0;
+        };
     }
 
     public static double getBoostItemAmount(Player player) {

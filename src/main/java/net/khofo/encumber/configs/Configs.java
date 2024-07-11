@@ -29,6 +29,10 @@ public class Configs {
     public static final ForgeConfigSpec.ConfigValue<Boolean> SINK_IN_WATER_LAVA;
     public static final ForgeConfigSpec.ConfigValue<Boolean> TOGGLE_ANVIL_ICON;
     public static final ForgeConfigSpec.ConfigValue<Boolean> TOGGLE_WEIGHT_TEXT;
+    public static final ForgeConfigSpec.ConfigValue<Double> UNENCUMBERMENT_LEVEL1_MULTIPLIER;
+    public static final ForgeConfigSpec.ConfigValue<Double> UNENCUMBERMENT_LEVEL2_MULTIPLIER;
+    public static final ForgeConfigSpec.ConfigValue<Double> UNENCUMBERMENT_LEVEL3_MULTIPLIER;
+    public static final ForgeConfigSpec.ConfigValue<Boolean> DISABLE_ENCHANTS;
 
     static {
         BUILDER.push("Configs for Encumbered:");
@@ -99,6 +103,16 @@ public class Configs {
 
         TOGGLE_WEIGHT_TEXT = BUILDER.comment("\nWhether or not the weight text appears. default: true")
                 .define("toggle_weight_text", true);
+
+        UNENCUMBERMENT_LEVEL1_MULTIPLIER = BUILDER.comment("\nMultiplier for Unencumberment Level 1")
+                .defineInRange("unencumberment_level_1_multiplier", 1.2, 0.1, 100.0);
+        UNENCUMBERMENT_LEVEL2_MULTIPLIER = BUILDER.comment("\nMultiplier for Unencumberment Level 2")
+                .defineInRange("unencumberment_level_2_multiplier", 1.5, 0.1, 100.0);
+        UNENCUMBERMENT_LEVEL3_MULTIPLIER = BUILDER.comment("\nMultiplier for Unencumberment Level 3")
+                .defineInRange("unencumberment_level_3_multiplier", 2.0, 0.1, 100.0);
+
+        DISABLE_ENCHANTS = BUILDER.comment("\nDisables Unencumberment enchant. default: false")
+                .define("disable_enchants", false);
 
         BUILDER.pop();
         SPEC = BUILDER.build();

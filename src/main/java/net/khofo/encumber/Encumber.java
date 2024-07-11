@@ -2,21 +2,20 @@ package net.khofo.encumber;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.JsonSyntaxException;
 import com.google.gson.reflect.TypeToken;
 import com.mojang.logging.LogUtils;
 import net.khofo.encumber.commands.WeightCommands;
 import net.khofo.encumber.configs.Configs;
+import net.khofo.encumber.enchantment.UnencumbermentEnchant;
 import net.khofo.encumber.events.ClientEventHandler;
 import net.khofo.encumber.events.TooltipEvent;
 import net.khofo.encumber.events.WeightEvent;
-import net.khofo.encumber.overlays.WeightEditScreen;
 import net.khofo.encumber.overlays.WeightOverlay;
-import net.minecraft.client.Minecraft;
-import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
+import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.item.*;
+import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.IEventBus;
@@ -28,7 +27,9 @@ import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.fml.loading.FMLPaths;
+import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
+import net.minecraftforge.registries.RegistryObject;
 import org.slf4j.Logger;
 
 import java.io.*;
@@ -66,12 +67,19 @@ public class Encumber {
         MinecraftForge.EVENT_BUS.register(this);
         ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, Configs.SPEC, "encumber-common.toml");
         MinecraftForge.EVENT_BUS.register(ClientEventHandler.KeyInputHandler.class);
+        ENCHANTMENTS.register(FMLJavaModLoadingContext.get().getModEventBus());
     }
 
     private void commonSetup(final FMLCommonSetupEvent event) {
         loadItemWeights();
         MinecraftForge.EVENT_BUS.register(WeightCommands.class);
     }
+
+    public static final DeferredRegister<Enchantment> ENCHANTMENTS = DeferredRegister.create(ForgeRegistries.ENCHANTMENTS, "encumber");
+
+    public static final RegistryObject<Enchantment> UNENCUMBERMENT = ENCHANTMENTS.register("unencumberment",
+            () -> new UnencumbermentEnchant(Enchantment.Rarity.RARE, EquipmentSlot.LEGS));
+
 
     public static void updateConfigWeights() {
         Path configPath = FMLPaths.CONFIGDIR.get().resolve("item_weights.json");
