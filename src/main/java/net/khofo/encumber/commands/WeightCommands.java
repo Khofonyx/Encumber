@@ -5,6 +5,7 @@ import com.mojang.brigadier.arguments.DoubleArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import net.khofo.encumber.Encumber;
+import net.khofo.encumber.configs.Configs;
 import net.khofo.encumber.groups.ItemGroups;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
@@ -16,6 +17,7 @@ import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.registries.ForgeRegistries;
 
+import java.awt.*;
 import java.util.List;
 import java.util.Map;
 
@@ -47,16 +49,71 @@ public class WeightCommands {
                                                     String group = StringArgumentType.getString(context, "group").toUpperCase();
                                                     double weight = DoubleArgumentType.getDouble(context, "weight");
                                                     return setGroupWeight(context, group, weight);}))))
-                /*.then(Commands.literal("boost")
-                                .then(Commands.literal("set")
-                                        .then(Commands.argument("item", ResourceLocationArgument.id())
-                                            .then(Commands.argument("weight", DoubleArgumentType.doubleArg())
-                                                .executes(context -> getItemWeight(context, ResourceLocationArgument.getId(context, "item")))))))
                         .then(Commands.literal("boost")
-                                .then(Commands.literal("get")
-                                        .then(Commands.argument("item", ResourceLocationArgument.id())
-                                                .executes(context -> getItemWeight(context, ResourceLocationArgument.getId(context, "item")))))) */
+                                .then(Commands.argument("item", ResourceLocationArgument.id())
+                                        .then(Commands.argument("amount", DoubleArgumentType.doubleArg())
+                                                .executes(context -> {
+                                                    ResourceLocation item = ResourceLocationArgument.getId(context, "item");
+                                                    double amount = DoubleArgumentType.getDouble(context, "amount");
+                                                    return boostItem(context, item, amount);
+                                                }))))
+                        .then(Commands.literal("threshold")
+                                .then(Commands.literal("encumbered")
+                                        .then(Commands.argument("value", DoubleArgumentType.doubleArg())
+                                                .executes(context -> setEncumberedThreshold(context, DoubleArgumentType.getDouble(context, "value")))))
+                                .then(Commands.literal("over_encumbered")
+                                        .then(Commands.argument("value", DoubleArgumentType.doubleArg())
+                                                .executes(context -> setOverEncumberedThreshold(context, DoubleArgumentType.getDouble(context, "value")))))
+                        )
+                        .then(Commands.literal("help")
+                                .executes(context -> {
+                                    context.getSource().sendSuccess(() -> Component.literal("Available commands:"), true);
+                                    context.getSource().sendSuccess(() -> Component.literal("/weight get <item> - Gets the weight of a item. <item> should be the registry name (Ex. minecraft:stone)"), true);
+                                    context.getSource().sendSuccess(() -> Component.literal("/weight set <item> <weight> - Sets the weight of a specified item"), true);
+                                    context.getSource().sendSuccess(() -> Component.literal("/weight setgroup <group> <weight> - Sets the weight for a predefined group of items"), true);
+                                    context.getSource().sendSuccess(() -> Component.literal("/weight boost <item> <amount> - Creates a boost item"), true);
+                                    context.getSource().sendSuccess(() -> Component.literal("/weight threshold encumbered <value> - Sets the encumbered (yellow) threshold"), true);
+                                    context.getSource().sendSuccess(() -> Component.literal("/weight threshold over_encumbered <value> - Sets the over_encumbered (red) threshold"), true);
+                                    return 1;
+                                }))
         );
+    }
+
+    private static int setEncumberedThreshold(CommandContext<CommandSourceStack> context, double value) {
+        Configs.ENCUMBERED_THRESHOLD.set(value);
+        context.getSource().sendSuccess(() -> Component.literal("Set Encumbered Threshold To: " + value), true);
+        return 1;
+    }
+
+    private static int setOverEncumberedThreshold(CommandContext<CommandSourceStack> context, double value) {
+        Configs.OVER_ENCUMBERED_THRESHOLD.set(value);
+        context.getSource().sendSuccess(() -> Component.literal("Set Over_Encumbered Threshold To: " + value), true);
+        return 1;
+    }
+
+
+
+
+    private static int boostItem(CommandContext<CommandSourceStack> context, ResourceLocation item, double amount) {
+        List<String> boostItems = Configs.BOOST_ITEMS.get();
+        List<Double> boostAmounts = Configs.BOOST_AMOUNT.get();
+
+        String itemName = item.toString();
+
+        if (!boostItems.contains(itemName)) {
+            boostItems.add(itemName);
+            boostAmounts.add(amount);
+        } else {
+            int index = boostItems.indexOf(itemName);
+            boostAmounts.set(index, amount);
+        }
+
+        Configs.BOOST_ITEMS.set(boostItems);
+        Configs.BOOST_AMOUNT.set(boostAmounts);
+
+        context.getSource().sendSuccess(() -> Component.literal("Successfully made " + itemName + " a boost item with boost amount: " + amount), true);
+
+        return 1;
     }
 
     private static int getItemWeight(CommandContext<CommandSourceStack> context, ResourceLocation item) {

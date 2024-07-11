@@ -73,13 +73,15 @@ public class WeightOverlay {
                     icon_y += (random.nextInt(1) - 1); // Random jiggle of -1, 0, or 1
                 }
             }
-            
+
+            int anvilOffset_x = WeightEvent.getThresholdInt(Configs.ANVIL_UI_X_OFFSET);
+            int anvilOffset_y = WeightEvent.getThresholdInt(Configs.ANVIL_UI_Y_OFFSET);
             RenderSystem.setShader(GameRenderer::getPositionTexShader);
             RenderSystem.setShaderTexture(0, anvilIcon);
             RenderSystem.enableBlend();
             RenderSystem.blendFuncSeparate(770, 771, 1, 0);
             RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
-            guiGraphics.blit(anvilIcon, icon_x - (iconSize / 2), icon_y - (iconSize / 2), 0, 0, iconSize, iconSize, iconSize, iconSize);
+            guiGraphics.blit(anvilIcon, icon_x - (iconSize / 2) + anvilOffset_x, icon_y - (iconSize / 2) - anvilOffset_y, 0, 0, iconSize, iconSize, iconSize, iconSize);
             RenderSystem.disableBlend();
 
             // Calculate the width of the text to center it properly

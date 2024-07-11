@@ -8,6 +8,7 @@ import com.mojang.logging.LogUtils;
 import net.khofo.encumber.commands.WeightCommands;
 import net.khofo.encumber.configs.Configs;
 import net.khofo.encumber.events.ClientEventHandler;
+import net.khofo.encumber.events.TooltipEvent;
 import net.khofo.encumber.events.WeightEvent;
 import net.khofo.encumber.overlays.WeightEditScreen;
 import net.khofo.encumber.overlays.WeightOverlay;
@@ -166,6 +167,7 @@ public class Encumber {
         public static void onClientSetup(FMLClientSetupEvent event)
         {
             MinecraftForge.EVENT_BUS.register(WeightOverlay.class);
+            MinecraftForge.EVENT_BUS.register(new TooltipEvent());
         }
     }
 }

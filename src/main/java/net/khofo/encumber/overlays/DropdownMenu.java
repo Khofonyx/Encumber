@@ -50,13 +50,14 @@ public class DropdownMenu {
         if (group.isExpanded()) {
             for (GroupItem child : group.getSubGroups()) {
                 if (child instanceof Group) {
-                    DropdownMenu childMenu = new DropdownMenu((Group) child);
-                    height += childMenu.calculateHeight();
+                    int childHeight = new DropdownMenu((Group) child).calculateHeight();
+                    height += childHeight;
                 } else {
                     height += 20;
                 }
             }
         }
+
         return height;
     }
 

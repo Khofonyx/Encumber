@@ -31,8 +31,10 @@ public class CustomScrollWidget extends AbstractScrollWidget {
         for (DropdownMenu menu : dropdownMenus) {
             height += menu.calculateHeight();
         }
+        System.out.println("Calculated inner height: " + height);
         return height;
     }
+
 
     @Override
     protected double scrollRate() {
@@ -41,16 +43,43 @@ public class CustomScrollWidget extends AbstractScrollWidget {
 
     @Override
     protected void renderContents(GuiGraphics pGuiGraphics, int pMouseX, int pMouseY, float pPartialTick) {
-        int y = this.getY() - (int) this.scrollAmount(); // Adjust starting Y position based on scroll amount
+        int startY = this.getY();
+        int endY = this.getY() + this.height;
+        int y = startY - (int) this.scrollAmount(); // Adjust starting Y position based on scroll amount
         int indent = 20;
 
+        System.out.println("Starting render at Y: " + y + " with scroll amount: " + this.scrollAmount() + " startY: " + startY + " endY: " + endY);
+
         for (DropdownMenu menu : dropdownMenus) {
-            y = menu.render(this.getX(), y, this.getX() + 165, indent, pGuiGraphics, scrollAmount);
+            int menuHeight = menu.calculateHeight();
+            System.out.println("Menu height: " + menuHeight);
+
+            // Check if the menu is within the visible area
+            if (y + menuHeight > startY && y < endY) {
+                System.out.println("Rendering menu at Y: " + y);
+                y = menu.render(this.getX(), y, this.getX() + 165, indent, pGuiGraphics, scrollAmount);
+            } else {
+                // Skip rendering if the menu is outside the visible area
+                y += menuHeight;
+                System.out.println("Skipping menu at Y: " + y + " with height: " + menuHeight);
+            }
         }
     }
 
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
+        if (button == 0) {
+            int scrollbarXStart = this.getX() + this.getWidth();
+            int scrollbarXEnd = scrollbarXStart + 6;
+            int scrollbarYStart = this.getY() + (int) (this.scrollAmount * (this.height - this.getScrollBarHeight()) / this.getMaxScrollAmount());
+            int scrollbarYEnd = scrollbarYStart + this.getScrollBarHeight();
+
+            if (mouseX >= scrollbarXStart && mouseX <= scrollbarXEnd && mouseY >= scrollbarYStart && mouseY <= scrollbarYEnd) {
+                this.scrolling = true;
+                return true;
+            }
+        }
+
         int y = this.getY() - (int) this.scrollAmount(); // Adjust starting Y position based on scroll amount
         int indent = 0;
 
@@ -79,14 +108,14 @@ public class CustomScrollWidget extends AbstractScrollWidget {
 
     @Override
     public boolean mouseDragged(double mouseX, double mouseY, int button, double dragX, double dragY) {
-        if (this.visible && this.isFocused() && this.scrolling) {
-            if (mouseY < (double)this.getY()) {
+        if (this.visible && this.scrolling) {
+            if (mouseY < (double) this.getY()) {
                 this.setScrollAmount(0.0D);
-            } else if (mouseY > (double)(this.getY() + this.height)) {
+            } else if (mouseY > (double) (this.getY() + this.height)) {
                 this.setScrollAmount(this.getMaxScrollAmount());
             } else {
                 int scrollbarHeight = this.getScrollBarHeight();
-                double scrollRatio = (double)Math.max(1, this.getMaxScrollAmount() / (this.height - scrollbarHeight));
+                double scrollRatio = (double) Math.max(1, this.getMaxScrollAmount() / (this.height - scrollbarHeight));
                 this.setScrollAmount(this.scrollAmount() + dragY * scrollRatio);
             }
             return true;
@@ -99,10 +128,7 @@ public class CustomScrollWidget extends AbstractScrollWidget {
         if (!this.visible) {
             return false;
         } else {
-            //System.out.println("Original Scroll Amount: " + this.scrollAmount());
-            //System.out.println("pDelta: " + pDelta);
             this.setScrollAmount(this.scrollAmount() - (pDelta * this.scrollRate()));
-            //System.out.println("New Scroll Amount: " + this.scrollAmount());
             return true;
         }
     }
@@ -142,13 +168,17 @@ public class CustomScrollWidget extends AbstractScrollWidget {
         }
     }
 
-    private int getScrollBarHeight() {
+    /*private int getScrollBarHeight() {
         int innerHeight = this.getInnerHeight();
         if (innerHeight == 0) {
             return 0;
         } else {
             return Math.max(32, this.height * this.height / innerHeight);
         }
+    }*/
+
+    private int getScrollBarHeight() {
+        return Mth.clamp((int)((float)(this.height * this.height) / (float)this.getInnerHeight()), 32, this.height);
     }
 
     protected void renderDecorations(GuiGraphics pGuiGraphics) {
@@ -158,30 +188,21 @@ public class CustomScrollWidget extends AbstractScrollWidget {
 
     }
 
-    protected int innerPadding() {
-        return 4;
-    }
-
-    protected int totalInnerPadding() {
-        return this.innerPadding() * 2;
-    }
-
     protected double scrollAmount() {
         return this.scrollAmount;
     }
+
+    //private double lastScrollAmount = -1;
 
     @Override
     public void setScrollAmount(double scrollAmount) {
         double maxScroll = Math.max(0, getInnerHeight() - this.height);
         this.scrollAmount = Math.max(0, Math.min(scrollAmount, maxScroll));
+        System.out.println("Set scroll amount: " + this.scrollAmount + " (Max: " + maxScroll + ")");
     }
 
     protected int getMaxScrollAmount() {
         return this.getInnerHeight() - this.height;
-    }
-
-    private int getContentHeight() {
-        return this.getInnerHeight() + 4;
     }
 
     protected void renderBackground(GuiGraphics pGuiGraphics) {
@@ -198,20 +219,12 @@ public class CustomScrollWidget extends AbstractScrollWidget {
         if (this.scrollbarVisible()) {
             int scrollbarXStart = this.getX() + this.getWidth();
             int scrollbarXEnd = scrollbarXStart + 6;
-            int scrollbarYStart = this.getY() + (int)(this.scrollAmount * (this.height - this.getScrollBarHeight()) / this.getMaxScrollAmount());
+            int scrollbarYStart = this.getY() + (int) (this.scrollAmount * (this.height - this.getScrollBarHeight()) / this.getMaxScrollAmount());
             int scrollbarYEnd = scrollbarYStart + this.getScrollBarHeight();
+            //System.out.println("Rendering scrollbar from Y: " + scrollbarYStart + " to Y: " + scrollbarYEnd);
             pGuiGraphics.fillGradient(scrollbarXStart, scrollbarYStart, scrollbarXEnd, scrollbarYEnd, 0xFFAAAAAA, 0xFF888888);
         }
     }
-
-    protected boolean withinContentAreaTopBottom(int pTop, int pBottom) {
-        return (double)pBottom - this.scrollAmount >= (double)this.getY() && (double)pTop - this.scrollAmount <= (double)(this.getY() + this.height);
-    }
-
-    protected boolean withinContentAreaPoint(double pX, double pY) {
-        return pX >= (double)this.getX() && pX < (double)(this.getX() + this.width) && pY >= (double)this.getY() && pY < (double)(this.getY() + this.height);
-    }
-
     protected boolean scrollbarVisible() {
         return this.height < this.getInnerHeight();
     }

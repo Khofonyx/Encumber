@@ -19,6 +19,9 @@ public class Configs {
     public static final ForgeConfigSpec.ConfigValue<Double> OVER_ENCUMBERED_THRESHOLD;
     public static final ForgeConfigSpec.ConfigValue<Double> WEIGHT_UI_X_OFFSET;
     public static final ForgeConfigSpec.ConfigValue<Double> WEIGHT_UI_Y_OFFSET;
+
+    public static final ForgeConfigSpec.ConfigValue<Integer> ANVIL_UI_X_OFFSET;
+    public static final ForgeConfigSpec.ConfigValue<Integer> ANVIL_UI_Y_OFFSET;
     public static final ForgeConfigSpec.ConfigValue<Boolean> ALLOW_MULTIPLE_BOOST_ITEMS;
     public static final ForgeConfigSpec.ConfigValue<Boolean> RIDING_FLYING_JUMPING_TIED_TO_OVER_ENCUMBERED_THRESHOLD;
     public static final ForgeConfigSpec.ConfigValue<Boolean> SINK_IN_WATER_LAVA;
@@ -65,11 +68,17 @@ public class Configs {
         OVER_ENCUMBERED_THRESHOLD = BUILDER.comment("\nIf weight is above this, you get slowness 5, cannot jump, and cannot sprint (Negative values will break the mod) default: 100")
                 .define("over_encumbered_threshold", 100.0D);
 
-        WEIGHT_UI_Y_OFFSET = BUILDER.comment("\nSet the vertical offset for the UI that shows your weight, default is 5% from the top (near the bottom of the screen). default: 5")
+        WEIGHT_UI_Y_OFFSET = BUILDER.comment("\nSet the vertical offset for the UI that shows your weight, default is 10% from the top (near the bottom of the screen). default: 10")
                 .define("weight_ui_y_offset", 10D);
 
         WEIGHT_UI_X_OFFSET = BUILDER.comment("\nSet the horizontal offset for the UI that shows your weight, default is 50% from the left (centered horizontally). default: 50")
                 .define("weight_ui_x_offset", 50D);
+
+        ANVIL_UI_Y_OFFSET = BUILDER.comment("\nSet the vertical offset for the anvil UI. default: 0")
+                .define("anvil_ui_y_offset", 0);
+
+        ANVIL_UI_X_OFFSET = BUILDER.comment("\nSet the horizontal offset for the anvil UI. default: 0")
+                .define("anvil_ui_x_offset", 0);
 
         ALLOW_MULTIPLE_BOOST_ITEMS = BUILDER.comment("\nWhether or not boost item's additional capacities stack. If there are multiple boost items present in your inventory and this is false, it chooses the better boost item. default: false")
                 .define("allow_multiple_boost_items", false);

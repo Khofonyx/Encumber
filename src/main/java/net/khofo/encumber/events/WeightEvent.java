@@ -6,19 +6,32 @@ import net.khofo.encumber.accessors.LivingEntityAccessor;
 import net.khofo.encumber.mixins.LocalPlayerInvoker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.FluidTags;
+import net.minecraft.world.InteractionHand;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.animal.Pig;
+import net.minecraft.world.entity.animal.horse.AbstractHorse;
+import net.minecraft.world.entity.animal.horse.Llama;
+import net.minecraft.world.entity.monster.Strider;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.vehicle.AbstractMinecart;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.common.ForgeMod;
 import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.living.LivingEvent;
+import net.minecraftforge.event.entity.player.PlayerInteractEvent;
+import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 
 import java.util.ArrayList;
@@ -32,7 +45,29 @@ public class WeightEvent {
         if (!player.isSpectator() && !player.isCreative()) {
             double weight = calculateWeight(player);
             applyEffectsBasedOnWeight(player, weight);
+            if (player.isPassenger()) {
+                // If player is riding something
+                if (weight >= getWeightWithBoostItem(player, 1)) {
+                    // If player is riding something then becomes overweight, dismount them
+                    player.stopRiding();
+
+                    // Ensure the player is placed above ground level
+                    BlockPos currentPos = player.blockPosition();
+                    BlockPos safePos = findSafePositionAbove(currentPos, player);
+
+                    // Set the player's position to the safe position
+                    player.setPos(safePos.getX() + 0.5, safePos.getY() + 0.5, safePos.getZ() + 0.5);
+                }
+            }
         }
+    }
+
+    private BlockPos findSafePositionAbove(BlockPos pos, Player player) {
+        BlockPos newPos = pos.above();
+        while (!player.getCommandSenderWorld().noCollision(player.getBoundingBox().move(0, newPos.getY() - pos.getY(), 0))) {
+            newPos = newPos.above();
+        }
+        return newPos;
     }
 
    @SubscribeEvent
@@ -113,7 +148,11 @@ public class WeightEvent {
         ResourceLocation itemId = BuiltInRegistries.ITEM.getKey(stack.getItem());
         for (int i = 0; i < boostItems.size(); i++) {
             if (itemId != null && itemId.toString().equals(boostItems.get(i))) {
-                return boostAmounts.get(i);
+                if (getThresholdTF(Configs.ALLOW_MULTIPLE_BOOST_ITEMS)){
+                    return boostAmounts.get(i) * stack.getCount();
+                }else{
+                    return boostAmounts.get(i);
+                }
             }
         }
         return 0.0;
@@ -170,7 +209,7 @@ public class WeightEvent {
             player.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 6, 4, false, false, false));
             if (getThresholdTF(Configs.RIDING_FLYING_JUMPING_TIED_TO_OVER_ENCUMBERED_THRESHOLD)) {
                 player.stopFallFlying();
-                player.stopRiding();
+                //player.stopRiding();
                 if ((player.isInWater() || player.isInLava()) && getThresholdTF(Configs.SINK_IN_WATER_LAVA)){
                     boolean spacebarPressed = Minecraft.getInstance().options.keyJump.isDown();
                     if (spacebarPressed){
@@ -195,14 +234,87 @@ public class WeightEvent {
             if (weight >= getThreshold(Configs.FALL_FLYING_THRESHOLD) && getThreshold(Configs.FALL_FLYING_THRESHOLD) > -1) {
                 player.stopFallFlying();
             }
-            if (weight >= getThreshold(Configs.RIDING_THRESHOLD) && getThreshold(Configs.RIDING_THRESHOLD) > -1) {
-                player.stopRiding();
+            // Mounting is handled in OnEntityInteract
+        }
+    }
+
+    @SubscribeEvent
+    public void onEntityInteract(PlayerInteractEvent.EntityInteract event) {
+        Entity target = event.getTarget();
+        Player player = event.getEntity();
+
+        // Check if the entity can be ridden
+        if (!player.isSpectator() && !player.isCreative()) {
+            if (canBeRidden(target)) {
+                if (getThresholdTF(Configs.RIDING_FLYING_JUMPING_TIED_TO_OVER_ENCUMBERED_THRESHOLD)) {
+                    if (calculateWeight(player) >= getWeightWithBoostItem(player, 1) && getThreshold(Configs.OVER_ENCUMBERED_THRESHOLD) > -1) {
+                        if (isMountingAttempt(target, player, event.getHand())) {
+                            if (!event.isCanceled()) { // Check if the event has not been canceled already
+                                event.setCanceled(true); // Cancel the event to prevent mounting
+                            }
+                        }
+                        if (player.isPassenger()){
+
+                        }
+                    }
+                } else {
+                    if (calculateWeight(player) >= getThreshold(Configs.RIDING_THRESHOLD) && getThreshold(Configs.RIDING_THRESHOLD) > -1) {
+                        if (isMountingAttempt(target, player, event.getHand())) {
+                            if (!event.isCanceled()) { // Check if the event has not been canceled already
+                                event.setCanceled(true); // Cancel the event to prevent mounting
+                            }
+                        }
+                    }
+                }
             }
         }
     }
 
+    private boolean canBeRidden(Entity entity) {
+        // Check if the entity can be ridden
+        return entity instanceof AbstractMinecart ||
+                entity instanceof AbstractHorse && ((AbstractHorse) entity).isSaddled()||
+                entity instanceof Pig && ((Pig) entity).isSaddled() ||
+                entity instanceof Llama ||
+                entity instanceof Strider && ((Strider) entity).isSaddled();
+    }
+
+    private boolean isMountingAttempt(Entity target, Player player, InteractionHand hand) {
+        if (target instanceof AbstractHorse) {
+            AbstractHorse horse = (AbstractHorse) target;
+            // Check if the player is holding a saddle or horse armor
+            boolean isHoldingSaddle = !player.getItemInHand(hand).isEmpty() &&
+                    player.getItemInHand(hand).getItem() instanceof net.minecraft.world.item.SaddleItem;
+            return !isHoldingSaddle && !horse.isBaby();
+        }
+
+        if (target instanceof Pig) {
+            Pig pig = (Pig) target;
+            return pig.isSaddled();
+        }
+
+        if (target instanceof Strider) {
+            Strider strider = (Strider) target;
+            return strider.isSaddled();
+        }
+
+        if (target instanceof Llama) {
+            Llama llama = (Llama) target;
+            boolean isHoldingSaddle = !player.getItemInHand(hand).isEmpty() &&
+                    player.getItemInHand(hand).getItem() instanceof net.minecraft.world.item.SaddleItem;
+            return !isHoldingSaddle;
+        }
+
+        // For minecarts and other entities, assume right-clicking mounts them
+        return true;
+    }
+
     public static double getThreshold(ForgeConfigSpec.ConfigValue<Double> config) {
         return config.get() != null ? config.get() : 0.0D;
+    }
+
+    public static int getThresholdInt(ForgeConfigSpec.ConfigValue<Integer> config) {
+        return config.get() != null ? config.get() : 0;
     }
 
     public static Boolean getThresholdTF(ForgeConfigSpec.ConfigValue<Boolean> config) {

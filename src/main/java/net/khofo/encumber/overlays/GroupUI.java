@@ -19,7 +19,8 @@ public class GroupUI {
         Font font = Minecraft.getInstance().font;
 
         // Draw the hitbox for debugging
-        drawHitbox(guiGraphics, x, y, 200 - indent, 20, 0x55FF0000); // Red color, adjusted for indent
+        drawHitbox(guiGraphics, x, y, 200 - indent - 2, 18, 0x55808080);
+        drawHitbox(guiGraphics, x, y, 200 - indent, 20, 0x55AAAAAA);
 
         // Render the group row
         guiGraphics.drawString(font, group.getName(), x + 5, y + 5, 0xFFFFFF);
