@@ -11,7 +11,9 @@ public class Configs {
     public static final ForgeConfigSpec SPEC;
     public static final ForgeConfigSpec.ConfigValue<List<String>> CONTAINERS;
     public static final ForgeConfigSpec.ConfigValue<List<String>> BOOST_ITEMS;
-    public static final ForgeConfigSpec.ConfigValue<List<Double>> BOOST_AMOUNT;
+    public static final ForgeConfigSpec.ConfigValue<List<Double>> BOOST_ITEMS_AMOUNT;
+    public static final ForgeConfigSpec.ConfigValue<List<String>> BOOST_ARMORS;
+    public static final ForgeConfigSpec.ConfigValue<List<Double>> BOOST_ARMORS_AMOUNT;
     public static final ForgeConfigSpec.ConfigValue<Double> RIDING_THRESHOLD;
     public static final ForgeConfigSpec.ConfigValue<Double> FALL_FLYING_THRESHOLD;
     public static final ForgeConfigSpec.ConfigValue<Double> JUMPING_THRESHOLD;
@@ -44,11 +46,17 @@ public class Configs {
                         "minecraft:blue_shulker_box", "minecraft:brown_shulker_box", "minecraft:green_shulker_box",
                         "minecraft:red_shulker_box", "minecraft:black_shulker_box"), stringValidator);
 
-        BOOST_ITEMS = (ForgeConfigSpec.ConfigValue<List<String>>) (Object) BUILDER.comment("\nAdd any items you want to boost the player's carrying capacity")
-                .defineListAllowEmpty("boost_items", Arrays.asList("minecraft:diamond_helmet", "minecraft:emerald"), stringValidator);
+        BOOST_ITEMS = (ForgeConfigSpec.ConfigValue<List<String>>) (Object) BUILDER.comment("\nAdd any items you want to boost the player's carrying capacity. Item's here count in your inventory and when equipped.")
+                .defineListAllowEmpty("boost_items", Arrays.asList("minecraft:torch", "minecraft:emerald"), stringValidator);
 
-        BOOST_AMOUNT = (ForgeConfigSpec.ConfigValue<List<Double>>) (Object) BUILDER.comment("\nAdd boost amounts that correspond to the BOOST_ITEMS above")
-                .defineListAllowEmpty("boost_amount", Arrays.asList(100.0D, 1000.0D), doubleValidator);
+        BOOST_ITEMS_AMOUNT = (ForgeConfigSpec.ConfigValue<List<Double>>) (Object) BUILDER.comment("\nAdd boost amounts that correspond to the BOOST_ITEMS above")
+                .defineListAllowEmpty("boost_items_amount", Arrays.asList(100.0D, 1000.0D), doubleValidator);
+
+        BOOST_ARMORS = (ForgeConfigSpec.ConfigValue<List<String>>) (Object) BUILDER.comment("\nAdd any equipables you want to boost the player's carrying capacity. Items in this list require you to equip them before they take effect.")
+                .defineListAllowEmpty("boost_armors", Arrays.asList("minecraft:diamond_helmet"), stringValidator);
+
+        BOOST_ARMORS_AMOUNT = (ForgeConfigSpec.ConfigValue<List<Double>>) (Object) BUILDER.comment("\nAdd boost amounts that correspond to the BOOST_ARMORS above")
+                .defineListAllowEmpty("boost_armors_amount", Arrays.asList(100.0D), doubleValidator);
 
         RIDING_FLYING_JUMPING_TIED_TO_OVER_ENCUMBERED_THRESHOLD = BUILDER.comment("\nIf this is true, when the player is at the OVER_ENCUMBERED_THRESHOLD, they cannot jump, fly, or ride mounts. If false, you can configure these thresholds below. default: true")
                 .define("tie_to_over_encumbered_threshold", true);
@@ -80,8 +88,8 @@ public class Configs {
         ANVIL_UI_X_OFFSET = BUILDER.comment("\nSet the horizontal offset for the anvil UI. default: 0")
                 .define("anvil_ui_x_offset", 0);
 
-        ALLOW_MULTIPLE_BOOST_ITEMS = BUILDER.comment("\nWhether or not boost item's additional capacities stack. If there are multiple boost items present in your inventory and this is false, it chooses the better boost item. default: false")
-                .define("allow_multiple_boost_items", false);
+        ALLOW_MULTIPLE_BOOST_ITEMS = BUILDER.comment("\nWhether or not boost item's additional capacities stack. If there are multiple boost items present in your inventory and this is false, it chooses the better boost item. default: true")
+                .define("allow_multiple_boost_items", true);
 
         SINK_IN_WATER_LAVA = BUILDER.comment("\nWhether or not the player sinks in WATER and LAVA while OVER_ENCUMBERED. default: true")
                 .define("sink_in_water_and_lava", true);

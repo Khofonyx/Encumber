@@ -104,40 +104,54 @@ public class WeightEvent {
     public static double getBoostItemAmount(Player player) {
         double maxBoostAmount = 0.0;
         List<String> boostItems = Configs.BOOST_ITEMS.get();
-        List<Double> boostAmounts = Configs.BOOST_AMOUNT.get();
+        List<String> boostArmors = Configs.BOOST_ARMORS.get();
+        List<Double> boostItemAmounts = Configs.BOOST_ITEMS_AMOUNT.get();
+        List<Double> boostArmorAmounts = Configs.BOOST_ARMORS_AMOUNT.get();
         Boolean allowMultipleBoostItems = getThresholdTF(Configs.ALLOW_MULTIPLE_BOOST_ITEMS);
 
         if (allowMultipleBoostItems) {
             // Check inventory, armor, and offhand for multiple boost items
             for (ItemStack stack : player.getInventory().items) {
-                maxBoostAmount += getBoostAmount(stack, boostItems, boostAmounts);
+                maxBoostAmount += getBoostAmount(stack, boostItems, boostItemAmounts);
             }
             for (ItemStack stack : player.getInventory().armor) {
-                maxBoostAmount += getBoostAmount(stack, boostItems, boostAmounts);
+                maxBoostAmount += getBoostAmount(stack, boostItems, boostItemAmounts);
+                maxBoostAmount += getBoostAmount(stack, boostArmors, boostArmorAmounts);
             }
-            maxBoostAmount += getBoostAmount(player.getOffhandItem(), boostItems, boostAmounts);
+            maxBoostAmount += getBoostAmount(player.getOffhandItem(), boostItems, boostItemAmounts);
+            maxBoostAmount += getBoostAmount(player.getOffhandItem(), boostArmors, boostArmorAmounts);
 
             // If using Curios API, check curios slots as well
             // TODO: Add Curios slot checking logic here if applicable
         } else {
             // Check for the boost item providing the greatest boost amount
             for (ItemStack stack : player.getInventory().items) {
-                double boostAmount = getBoostAmount(stack, boostItems, boostAmounts);
+                double boostAmount = getBoostAmount(stack, boostItems, boostItemAmounts);
                 if (boostAmount > maxBoostAmount) {
                     maxBoostAmount = boostAmount;
                 }
             }
             for (ItemStack stack : player.getInventory().armor) {
-                double boostAmount = getBoostAmount(stack, boostItems, boostAmounts);
+                double boostAmount = getBoostAmount(stack, boostItems, boostItemAmounts);
                 if (boostAmount > maxBoostAmount) {
                     maxBoostAmount = boostAmount;
                 }
+
+                double armorBoostAmount = getBoostAmount(stack, boostArmors, boostArmorAmounts);
+                if (armorBoostAmount > maxBoostAmount) {
+                    maxBoostAmount = armorBoostAmount;
+                }
+
             }
-            double offhandBoostAmount = getBoostAmount(player.getOffhandItem(), boostItems, boostAmounts);
+            double offhandBoostAmount = getBoostAmount(player.getOffhandItem(), boostItems, boostItemAmounts);
             if (offhandBoostAmount > maxBoostAmount) {
                 maxBoostAmount = offhandBoostAmount;
             }
 
+            offhandBoostAmount = getBoostAmount(player.getOffhandItem(), boostArmors, boostArmorAmounts);
+            if (offhandBoostAmount > maxBoostAmount) {
+                maxBoostAmount = offhandBoostAmount;
+            }
             // If using Curios API, check curios slots as well
             // TODO: Add Curios slot checking logic here if applicable
         }

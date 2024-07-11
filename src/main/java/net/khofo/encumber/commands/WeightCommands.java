@@ -96,7 +96,7 @@ public class WeightCommands {
 
     private static int boostItem(CommandContext<CommandSourceStack> context, ResourceLocation item, double amount) {
         List<String> boostItems = Configs.BOOST_ITEMS.get();
-        List<Double> boostAmounts = Configs.BOOST_AMOUNT.get();
+        List<Double> boostAmounts = Configs.BOOST_ITEMS_AMOUNT.get();
 
         String itemName = item.toString();
 
@@ -109,7 +109,7 @@ public class WeightCommands {
         }
 
         Configs.BOOST_ITEMS.set(boostItems);
-        Configs.BOOST_AMOUNT.set(boostAmounts);
+        Configs.BOOST_ITEMS_AMOUNT.set(boostAmounts);
 
         context.getSource().sendSuccess(() -> Component.literal("Successfully made " + itemName + " a boost item with boost amount: " + amount), true);
 
