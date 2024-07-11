@@ -104,12 +104,12 @@ public class Configs {
         TOGGLE_WEIGHT_TEXT = BUILDER.comment("\nWhether or not the weight text appears. default: true")
                 .define("toggle_weight_text", true);
 
-        UNENCUMBERMENT_LEVEL1_MULTIPLIER = BUILDER.comment("\nMultiplier for Unencumberment Level 1")
-                .defineInRange("unencumberment_level_1_multiplier", 1.2, 0.1, 100.0);
-        UNENCUMBERMENT_LEVEL2_MULTIPLIER = BUILDER.comment("\nMultiplier for Unencumberment Level 2")
-                .defineInRange("unencumberment_level_2_multiplier", 1.5, 0.1, 100.0);
-        UNENCUMBERMENT_LEVEL3_MULTIPLIER = BUILDER.comment("\nMultiplier for Unencumberment Level 3")
-                .defineInRange("unencumberment_level_3_multiplier", 2.0, 0.1, 100.0);
+        UNENCUMBERMENT_LEVEL1_MULTIPLIER = BUILDER.comment("\nMultiplier for Unencumberment Level 1 (Pick a value between 1 and 100)")
+                .defineInRange("unencumberment_level_1_multiplier", 1.1, 1, 100.0);
+        UNENCUMBERMENT_LEVEL2_MULTIPLIER = BUILDER.comment("\nMultiplier for Unencumberment Level 2 (Pick a value between 1 and 100)")
+                .defineInRange("unencumberment_level_2_multiplier", 1.25, 1, 100.0);
+        UNENCUMBERMENT_LEVEL3_MULTIPLIER = BUILDER.comment("\nMultiplier for Unencumberment Level 3 (Pick a value between 1 and 100)")
+                .defineInRange("unencumberment_level_3_multiplier", 1.5, 1, 100.0);
 
         DISABLE_ENCHANTS = BUILDER.comment("\nDisables Unencumberment enchant. default: false")
                 .define("disable_enchants", false);
