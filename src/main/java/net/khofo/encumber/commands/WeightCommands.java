@@ -80,7 +80,7 @@ public class WeightCommands {
     }
 
     private static int setEncumberedThreshold(CommandContext<CommandSourceStack> context, double value) {
-        Configs.ENCUMBERED_THRESHOLD.set(value);
+        Configs.ENCUMBERED_THRESHOLD_MULTIPLIER.set(value);
         context.getSource().sendSuccess(() -> Component.literal("Set Encumbered Threshold To: " + value), true);
         return 1;
     }

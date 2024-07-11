@@ -17,7 +17,7 @@ public class Configs {
     public static final ForgeConfigSpec.ConfigValue<Double> RIDING_THRESHOLD;
     public static final ForgeConfigSpec.ConfigValue<Double> FALL_FLYING_THRESHOLD;
     public static final ForgeConfigSpec.ConfigValue<Double> JUMPING_THRESHOLD;
-    public static final ForgeConfigSpec.ConfigValue<Double> ENCUMBERED_THRESHOLD;
+    public static final ForgeConfigSpec.ConfigValue<Double> ENCUMBERED_THRESHOLD_MULTIPLIER;
     public static final ForgeConfigSpec.ConfigValue<Double> OVER_ENCUMBERED_THRESHOLD;
     public static final ForgeConfigSpec.ConfigValue<Double> WEIGHT_UI_X_OFFSET;
     public static final ForgeConfigSpec.ConfigValue<Double> WEIGHT_UI_Y_OFFSET;
@@ -74,7 +74,7 @@ public class Configs {
         JUMPING_THRESHOLD = BUILDER.comment("\nIf weight is above this, you cannot jump (Negative values will break the mod) default: 100")
                 .define("jumping_threshold", 100.0D);
 
-        ENCUMBERED_THRESHOLD = BUILDER.comment("\nIf weight is above this, you cannot sprint (Negative values will break the mod) default: 70")
+        ENCUMBERED_THRESHOLD_MULTIPLIER = BUILDER.comment("\nThe Multiplier for the first encumberment stage. Pick a value between 1 and 100. For example, if your max weight is 1000, and you set the multiplier to 70, then 70% of 1000 is your first encumberment stage. default: 70")
                 .define("encumbered_threshold", 70.0D);
 
         OVER_ENCUMBERED_THRESHOLD = BUILDER.comment("\nIf weight is above this, you get slowness 5, cannot jump, and cannot sprint (Negative values will break the mod) default: 100")

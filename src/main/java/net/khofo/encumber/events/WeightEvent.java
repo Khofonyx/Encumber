@@ -93,16 +93,18 @@ public class WeightEvent {
     }
 
     public static double getWeightWithBoostItem(Player player, int slownessLevel) {
-        double baseThreshold = 0.0;
-
+        double baseThreshold = getThreshold(Configs.OVER_ENCUMBERED_THRESHOLD);
+        // Start at max weight
+        // If accessing first stage, maxWeight + boost amount * Encumberthreshold / 100
+        // If accessing second stage, mexWeight + boostAmount
         if (slownessLevel == 0) {
-            baseThreshold = getThreshold(Configs.ENCUMBERED_THRESHOLD);
+            baseThreshold = (baseThreshold + getBoostItemAmount(player)) * (getThreshold(Configs.ENCUMBERED_THRESHOLD_MULTIPLIER) / 100);
         } else if (slownessLevel == 1) {
-            baseThreshold = getThreshold(Configs.OVER_ENCUMBERED_THRESHOLD);
+            baseThreshold = getThreshold(Configs.OVER_ENCUMBERED_THRESHOLD) + getBoostItemAmount(player);
         }
 
         // Add the boost item amount to the base threshold
-        double totalWeight = baseThreshold + getBoostItemAmount(player);
+        double totalWeight = baseThreshold;
 
         // Get the player's leggings item
         ItemStack leggings = player.getItemBySlot(EquipmentSlot.LEGS);
@@ -260,7 +262,7 @@ public class WeightEvent {
                     }
                 }
             }
-        } else if (weight >= getWeightWithBoostItem(player, 0) && getThreshold(Configs.ENCUMBERED_THRESHOLD) > -1) {
+        } else if (weight >= getWeightWithBoostItem(player, 0) && getThreshold(Configs.ENCUMBERED_THRESHOLD_MULTIPLIER) > 0) {
             //player.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 6, 1, false, false, false));
             if (player instanceof LocalPlayer) {
                 LocalPlayer localPlayer = (LocalPlayer) player;

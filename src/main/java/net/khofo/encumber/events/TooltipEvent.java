@@ -12,6 +12,7 @@ import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraftforge.event.entity.player.ItemTooltipEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 
+import java.util.List;
 import java.util.Map;
 
 import static net.khofo.encumber.Encumber.itemWeights;
@@ -28,14 +29,24 @@ public class TooltipEvent {
             MutableComponent weightText = Component.literal("Weight: " + weight).withStyle(ChatFormatting.GOLD);
             event.getToolTip().add(weightText);
         }
-    }
 
-    private double getCarryingCapacityBoost(int level) {
-        return switch (level) {
-            case 1 -> Configs.UNENCUMBERMENT_LEVEL1_MULTIPLIER.get();
-            case 2 -> Configs.UNENCUMBERMENT_LEVEL2_MULTIPLIER.get();
-            case 3 -> Configs.UNENCUMBERMENT_LEVEL3_MULTIPLIER.get();
-            default -> 1.0;
-        };
+        // Display boost item amount
+        List<String> boostItems = Configs.BOOST_ITEMS.get();
+        List<Double> boostItemAmounts = Configs.BOOST_ITEMS_AMOUNT.get();
+        int boostItemIndex = boostItems.indexOf(itemId.toString());
+        if (boostItemIndex != -1) {
+            double boostAmount = boostItemAmounts.get(boostItemIndex);
+            MutableComponent boostText = Component.literal("Boost Amount: " + boostAmount).withStyle(ChatFormatting.GREEN);
+            event.getToolTip().add(boostText);
+        }
+
+        List<String> boostArmors = Configs.BOOST_ARMORS.get();
+        List<Double> boostArmorAmounts = Configs.BOOST_ARMORS_AMOUNT.get();
+        int boostArmorIndex = boostArmors.indexOf(itemId.toString());
+        if (boostArmorIndex != -1) {
+            double boostAmount = boostArmorAmounts.get(boostArmorIndex);
+            MutableComponent boostText = Component.literal("Boost Amount: " + boostAmount).withStyle(ChatFormatting.GREEN);
+            event.getToolTip().add(boostText);
+        }
     }
 }

@@ -21,8 +21,8 @@ public abstract class PlayerMixin {
         if(!player.isCreative() && !player.isSpectator()){
             double playerWeight = WeightEvent.calculateWeight(player);
             double boostItemWeight = WeightEvent.getWeightWithBoostItem(player, 0);
-            double threshold = WeightEvent.getThreshold(Configs.ENCUMBERED_THRESHOLD);
-            if (playerWeight >= boostItemWeight && threshold > -1) {
+            double threshold_multiplier = WeightEvent.getThreshold(Configs.ENCUMBERED_THRESHOLD_MULTIPLIER);
+            if (playerWeight >= boostItemWeight && threshold_multiplier > 0) {
                 cir.setReturnValue(false);
             }
         }
