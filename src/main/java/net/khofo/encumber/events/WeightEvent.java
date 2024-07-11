@@ -94,9 +94,6 @@ public class WeightEvent {
 
     public static double getWeightWithBoostItem(Player player, int slownessLevel) {
         double baseThreshold = getThreshold(Configs.OVER_ENCUMBERED_THRESHOLD);
-        // Start at max weight
-        // If accessing first stage, maxWeight + boost amount * Encumberthreshold / 100
-        // If accessing second stage, mexWeight + boostAmount
         if (slownessLevel == 0) {
             baseThreshold = (baseThreshold + getBoostItemAmount(player)) * (getThreshold(Configs.ENCUMBERED_THRESHOLD_MULTIPLIER) / 100);
         } else if (slownessLevel == 1) {
