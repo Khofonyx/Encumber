@@ -72,7 +72,7 @@ public class WeightCommands {
                                     context.getSource().sendSuccess(() -> Component.literal("/weight set <item> <weight> - Sets the weight of a specified item"), true);
                                     context.getSource().sendSuccess(() -> Component.literal("/weight setgroup <group> <weight> - Sets the weight for a predefined group of items"), true);
                                     context.getSource().sendSuccess(() -> Component.literal("/weight boost <item> <amount> - Creates a boost item"), true);
-                                    context.getSource().sendSuccess(() -> Component.literal("/weight threshold encumbered <value> - Sets the encumbered (yellow) threshold"), true);
+                                    context.getSource().sendSuccess(() -> Component.literal("/weight threshold encumbered <value> - Sets the encumbered (yellow) multiplier"), true);
                                     context.getSource().sendSuccess(() -> Component.literal("/weight threshold over_encumbered <value> - Sets the over_encumbered (red) threshold"), true);
                                     return 1;
                                 }))
@@ -81,7 +81,7 @@ public class WeightCommands {
 
     private static int setEncumberedThreshold(CommandContext<CommandSourceStack> context, double value) {
         Configs.ENCUMBERED_THRESHOLD_MULTIPLIER.set(value);
-        context.getSource().sendSuccess(() -> Component.literal("Set Encumbered Threshold To: " + value), true);
+        context.getSource().sendSuccess(() -> Component.literal("Set Encumbered Multiplier To: " + value), true);
         return 1;
     }
 
