@@ -18,7 +18,7 @@ public class BaseItem implements GroupItem {
         if (itemStack.isEmpty()) {
             System.out.println("ItemStack creation failed for name: " + name);
         } else {
-            System.out.println("ItemStack created for name: " + name);
+            System.out.println("ItemStack created for: " + name);
         }
     }
 

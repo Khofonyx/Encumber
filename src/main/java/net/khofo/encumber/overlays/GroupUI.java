@@ -18,37 +18,32 @@ public class GroupUI {
     public static int renderGroup(Group group, int x, int y, int weightX, int indent, GuiGraphics guiGraphics, double scrollAmount) {
         Font font = Minecraft.getInstance().font;
 
-        // Draw the hitbox for debugging
         drawHitbox(guiGraphics, x, y, 200 - indent - 2, 18, 0x55808080);
         drawHitbox(guiGraphics, x, y, 200 - indent, 20, 0x55AAAAAA);
 
-        // Render the group row
         guiGraphics.drawString(font, group.getName(), x + 5, y + 5, 0xFFFFFF);
 
-        // Get or create the CustomEditBox for this group
         CustomEditBox weightField = editBoxMap.computeIfAbsent(group, g -> {
             CustomEditBox eb = new CustomEditBox(font, weightX - 3, y, 50, 19, Component.literal(""));
             eb.setValue(String.format("%.4f", g.getWeight()));
             return eb;
         });
 
-        // Update EditBox position and render state
         weightField.setX(weightX - 3);
         weightField.setY(y);
         weightField.setEditable(!group.isExpanded());
         weightField.renderWidget(guiGraphics, 0, 0, 0);
 
-        int currentY = y + 20; // Start the next element below this one
+        int currentY = y + 20;
 
-        // Render subgroups and base items if the group is expanded
         if (group.isExpanded()) {
             for (GroupItem subGroup : group.getSubGroups()) {
                 if (subGroup instanceof BaseItem) {
                     currentY = BaseItemUI.renderBaseItem((BaseItem) subGroup, x + indent, currentY, weightX, guiGraphics, scrollAmount);
                 } else if (subGroup instanceof Group) {
-                    currentY = renderGroup((Group) subGroup, x + indent, currentY, weightX, indent, guiGraphics,scrollAmount);
+                    int previousY = currentY;
+                    currentY = renderGroup((Group) subGroup, x + indent, currentY, weightX, indent, guiGraphics, scrollAmount);
                 }
-                // No need to add extra spacing here as the renderBaseItem and renderGroup methods already handle spacing
             }
         }
         return currentY;
@@ -68,11 +63,9 @@ public class GroupUI {
         unfocusAll();
         CustomEditBox weightField = editBoxMap.get(group);
         if (weightField != null && weightField.isMouseOver(mouseX, mouseY + scrollAmount)) {
-            System.out.println("Scroll AMOUNT: " + scrollAmount);
             if (weightField.isEditable()) {
                 weightField.setFocused(true);
                 weightField.onClick(mouseX, mouseY + scrollAmount);
-                System.out.println("CustomEditBox mouseClicked: " + group.getName() + ", Focused: " + weightField.isFocused());
             } else {
                 weightField.setFocused(false);
             }
@@ -120,8 +113,6 @@ public class GroupUI {
                 } else {
                     group.setWeight(newWeight);
                 }
-
-                System.out.println("CustomEditBox charTyped: " + group.getName() + ", New Weight: " + newWeight);
             } catch (NumberFormatException e) {
                 // Handle invalid input if necessary
                 System.out.println("Invalid number format: " + weightField.getValue());

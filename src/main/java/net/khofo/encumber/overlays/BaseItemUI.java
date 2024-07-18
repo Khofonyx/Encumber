@@ -51,12 +51,10 @@ public class BaseItemUI {
     }
 
     public static void renderItemName(GuiGraphics guiGraphics, Font font, BaseItem item, int x, int y) {
-        String itemName = item.getName();
+        String fullItemName = item.getName();
 
-        // Remove the "minecraft:" prefix if present
-        if (itemName.startsWith("minecraft:")) {
-            itemName = itemName.substring(10); // Remove the first 10 characters
-        }
+        // Remove the mod name prefix if present
+        String itemName = fullItemName.contains(":") ? fullItemName.split(":")[1] : fullItemName;
 
         // Render the item name
         guiGraphics.drawString(font, itemName, x + 20, y, 0xFFFFFF);
@@ -74,7 +72,6 @@ public class BaseItemUI {
             if (weightField.isEditable()) {
                 weightField.setFocused(true);
                 weightField.onClick(mouseX, mouseY + scrollAmount);
-                System.out.println("CustomEditBox mouseClicked: " + item.getName() + ", Focused: " + weightField.isFocused());
             } else {
                 weightField.setFocused(false);
             }
@@ -98,8 +95,6 @@ public class BaseItemUI {
                 ResourceLocation itemName = new ResourceLocation(item.getName());
                 Encumber.itemWeights.put(itemName, newWeight);
                 Encumber.updateConfigWeights(); // Assuming this method updates the config file
-
-                System.out.println("CustomEditBox charTyped: " + item.getName() + ", New Weight: " + newWeight);
             } catch (NumberFormatException e) {
                 // Handle invalid input if necessary
                 System.out.println("Invalid number format: " + weightField.getValue());

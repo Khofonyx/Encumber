@@ -31,8 +31,7 @@ public class CustomScrollWidget extends AbstractScrollWidget {
         for (DropdownMenu menu : dropdownMenus) {
             height += menu.calculateHeight();
         }
-        System.out.println("Calculated inner height: " + height);
-        return height;
+        return (height + 300) / 2;
     }
 
 
@@ -52,16 +51,17 @@ public class CustomScrollWidget extends AbstractScrollWidget {
 
         for (DropdownMenu menu : dropdownMenus) {
             int menuHeight = menu.calculateHeight();
-            System.out.println("Menu height: " + menuHeight);
+            System.out.println("Menu height: " + menuHeight + ", Current Y: " + y);
 
             // Check if the menu is within the visible area
             if (y + menuHeight > startY && y < endY) {
                 System.out.println("Rendering menu at Y: " + y);
+                int previousY = y;
                 y = menu.render(this.getX(), y, this.getX() + 165, indent, pGuiGraphics, scrollAmount);
+                System.out.println("Rendered menu from Y: " + previousY + " to Y: " + y);
             } else {
-                // Skip rendering if the menu is outside the visible area
-                y += menuHeight;
                 System.out.println("Skipping menu at Y: " + y + " with height: " + menuHeight);
+                y += menuHeight;
             }
         }
     }
@@ -198,7 +198,6 @@ public class CustomScrollWidget extends AbstractScrollWidget {
     public void setScrollAmount(double scrollAmount) {
         double maxScroll = Math.max(0, getInnerHeight() - this.height);
         this.scrollAmount = Math.max(0, Math.min(scrollAmount, maxScroll));
-        System.out.println("Set scroll amount: " + this.scrollAmount + " (Max: " + maxScroll + ")");
     }
 
     protected int getMaxScrollAmount() {
@@ -221,7 +220,6 @@ public class CustomScrollWidget extends AbstractScrollWidget {
             int scrollbarXEnd = scrollbarXStart + 6;
             int scrollbarYStart = this.getY() + (int) (this.scrollAmount * (this.height - this.getScrollBarHeight()) / this.getMaxScrollAmount());
             int scrollbarYEnd = scrollbarYStart + this.getScrollBarHeight();
-            //System.out.println("Rendering scrollbar from Y: " + scrollbarYStart + " to Y: " + scrollbarYEnd);
             pGuiGraphics.fillGradient(scrollbarXStart, scrollbarYStart, scrollbarXEnd, scrollbarYEnd, 0xFFAAAAAA, 0xFF888888);
         }
     }

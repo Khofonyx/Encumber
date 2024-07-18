@@ -11,8 +11,6 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class ItemGroups {
-
-    public static Group rootGroup = new Group("Minecraft", 0.0);
     public static final Map<String, List<Item>> groups = new HashMap<>();
 
     static {
@@ -20,9 +18,12 @@ public class ItemGroups {
         // Initialize the root group and its subgroups/items
     }
 
-    public static void initGroup(Group rootGroup) {
+    public static List<Group> initGroups() {
         // Access the existing item weights map
         Map<ResourceLocation, Double> items = Encumber.itemWeights;
+
+        // Create a map to store groups by mod name
+        Map<String, Group> modGroups = new HashMap<>();
 
         // Convert the map entries to a list and sort them alphabetically by item name
         List<Map.Entry<ResourceLocation, Double>> sortedItems = items.entrySet()
@@ -30,17 +31,28 @@ public class ItemGroups {
                 .sorted(Map.Entry.comparingByKey((a, b) -> a.toString().compareTo(b.toString())))
                 .collect(Collectors.toList());
 
-        // Iterate through the sorted items and add them to the main subgroup
+        // Iterate through the sorted items
         for (Map.Entry<ResourceLocation, Double> entry : sortedItems) {
             ResourceLocation itemName = entry.getKey();
             Double itemWeight = entry.getValue();
-            BaseItem baseItem = new BaseItem(itemName.toString(), itemWeight);
-            rootGroup.addSubGroup(baseItem);
+
+            // Extract the mod name from the item name
+            String modName = itemName.getNamespace();
+            String fullRegistryName = itemName.toString();
+
+            // Get or create the group for the mod
+            Group modGroup = modGroups.computeIfAbsent(modName, k -> new Group(modName, 0.0));
+
+            // Create the base item with the full registry name and add it to the mod group
+            BaseItem baseItem = new BaseItem(fullRegistryName, itemWeight);
+            modGroup.addSubGroup(baseItem);
         }
+
+        // Return the list of mod groups
+        return new ArrayList<>(modGroups.values());
     }
 
     private static void generateGroups() {
-        initGroup(rootGroup);
         groups.put("CARPETS", new ArrayList<>());
         groups.put("ARMORS", new ArrayList<>());
         groups.put("STAIRS", new ArrayList<>());

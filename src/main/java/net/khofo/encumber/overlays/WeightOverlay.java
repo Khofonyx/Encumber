@@ -70,7 +70,7 @@ public class WeightOverlay {
                 // Add jiggle logic
                 long tickCount = minecraft.level.getGameTime();
                 if (tickCount % (Math.max(1, 2) * 3 + 1) == 0) {
-                    icon_y += (random.nextInt(1) - 1); // Random jiggle of -1, 0, or 1
+                    icon_y += (random.nextInt(1) - 1);
                 }
             }
 
@@ -81,7 +81,10 @@ public class WeightOverlay {
             RenderSystem.enableBlend();
             RenderSystem.blendFuncSeparate(770, 771, 1, 0);
             RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
-            guiGraphics.blit(anvilIcon, icon_x - (iconSize / 2) + anvilOffset_x, icon_y - (iconSize / 2) - anvilOffset_y, 0, 0, iconSize, iconSize, iconSize, iconSize);
+            if (WeightEvent.getThresholdTF(Configs.TOGGLE_ANVIL_ICON)){
+                guiGraphics.blit(anvilIcon, icon_x - (iconSize / 2) + anvilOffset_x, icon_y - (iconSize / 2) - anvilOffset_y, 0, 0, iconSize, iconSize, iconSize, iconSize);
+
+            }
             RenderSystem.disableBlend();
 
             // Calculate the width of the text to center it properly

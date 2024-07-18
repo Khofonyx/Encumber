@@ -6,6 +6,8 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.client.gui.components.Button;
 
+import java.util.List;
+
 
 public class WeightEditScreen extends Screen {
     private CustomScrollWidget customScrollWidget;
@@ -18,16 +20,19 @@ public class WeightEditScreen extends Screen {
     protected void init() {
         super.init();
 
-        // Initialize root group and add test data
-        Group rootGroup = new Group("Minecraft", 0.0);
-        ItemGroups.initGroup(rootGroup);
+        // Initialize the groups for each mod
+        List<Group> modGroups = ItemGroups.initGroups();
 
-        // Create a DropdownMenu with the root group
-        DropdownMenu dropdownMenu = new DropdownMenu(rootGroup);
 
         // Initialize the CustomScrollWidget
         customScrollWidget = new CustomScrollWidget(this.width / 2 - 100, 20, 200, this.height - 60, Component.literal("Scroll Widget"));
-        customScrollWidget.addDropdownMenu(dropdownMenu);
+
+
+        // Create a DropdownMenu for each mod group and add it to the CustomScrollWidget
+        for (Group modGroup : modGroups) {
+            DropdownMenu dropdownMenu = new DropdownMenu(modGroup);
+            customScrollWidget.addDropdownMenu(dropdownMenu);
+        }
 
         // Add a button to the screen
         this.addRenderableWidget(Button.builder(Component.literal("Done"), (button) -> {
