@@ -10,7 +10,7 @@ import net.khofo.encumber.enchantment.UnencumbermentEnchant;
 import net.khofo.encumber.events.ClientEventHandler;
 import net.khofo.encumber.events.TooltipEvent;
 import net.khofo.encumber.events.WeightEvent;
-import net.khofo.encumber.overlays.WeightOverlay;
+import net.khofo.encumber.UIElements.WeightOverlay;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.entity.EquipmentSlot;

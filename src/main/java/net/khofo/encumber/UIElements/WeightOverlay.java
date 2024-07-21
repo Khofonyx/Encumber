@@ -1,4 +1,4 @@
-package net.khofo.encumber.overlays;
+package net.khofo.encumber.UIElements;
 
 import net.khofo.encumber.Encumber;
 import net.khofo.encumber.configs.Configs;

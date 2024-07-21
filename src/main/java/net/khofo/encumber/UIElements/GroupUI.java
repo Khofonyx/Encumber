@@ -1,11 +1,10 @@
-package net.khofo.encumber.overlays;
+package net.khofo.encumber.UIElements;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.khofo.encumber.Encumber;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
@@ -39,7 +38,7 @@ public class GroupUI {
         if (group.isExpanded()) {
             for (GroupItem subGroup : group.getSubGroups()) {
                 if (subGroup instanceof BaseItem) {
-                    currentY = BaseItemUI.renderBaseItem((BaseItem) subGroup, x + indent, currentY, weightX, guiGraphics, scrollAmount);
+                    currentY = BaseItemUI.renderBaseItem((BaseItem) subGroup, x + indent, currentY, weightX, guiGraphics);
                 } else if (subGroup instanceof Group) {
                     int previousY = currentY;
                     currentY = renderGroup((Group) subGroup, x + indent, currentY, weightX, indent, guiGraphics, scrollAmount);
@@ -49,7 +48,6 @@ public class GroupUI {
         return currentY;
     }
 
-    // Helper method to draw the hitbox for debugging
     private static void drawHitbox(GuiGraphics guiGraphics, int x, int y, int width, int height, int color) {
         RenderSystem.setShader(GameRenderer::getPositionColorShader);
         RenderSystem.enableBlend();
@@ -76,7 +74,6 @@ public class GroupUI {
             }
         }
 
-        // Handle subgroups
         if (group.isExpanded()) {
             for (GroupItem subGroup : group.getSubGroups()) {
                 if (subGroup instanceof BaseItem) {
@@ -106,7 +103,6 @@ public class GroupUI {
             try {
                 double newWeight = Double.parseDouble(weightField.getValue());
 
-                // If the group is not expanded, update the group's weight and the weights of all items in its subgroups
                 if (!group.isExpanded()) {
                     group.setWeight(newWeight);
                     setWeightsForSubGroups(group, newWeight);
@@ -114,13 +110,11 @@ public class GroupUI {
                     group.setWeight(newWeight);
                 }
             } catch (NumberFormatException e) {
-                // Handle invalid input if necessary
                 System.out.println("Invalid number format: " + weightField.getValue());
             }
             return true;
         }
 
-        // Handle subgroups
         if (group.isExpanded()) {
             for (GroupItem subGroup : group.getSubGroups()) {
                 if (subGroup instanceof BaseItem) {
@@ -143,18 +137,15 @@ public class GroupUI {
             if (subGroup instanceof BaseItem) {
                 ((BaseItem) subGroup).setWeight(newWeight);
 
-                // Update the item weight in the Encumber.itemWeights map
-                ResourceLocation itemName = new ResourceLocation(((BaseItem) subGroup).getName());
+                ResourceLocation itemName = new ResourceLocation(subGroup.getName());
                 Encumber.itemWeights.put(itemName, newWeight);
             } else if (subGroup instanceof Group) {
                 ((Group) subGroup).setWeight(newWeight);
 
-                // Recursively set weights for subgroups
                 setWeightsForSubGroups((Group) subGroup, newWeight);
             }
         }
 
-        // Persist the updated weights
         Encumber.updateConfigWeights();
     }
 
@@ -164,7 +155,6 @@ public class GroupUI {
             weightField.tick();
         }
 
-        // Handle subgroups
         if (group.isExpanded()) {
             for (GroupItem subGroup : group.getSubGroups()) {
                 if (subGroup instanceof BaseItem) {
@@ -176,14 +166,12 @@ public class GroupUI {
         }
     }
 
-
     public static boolean keyPressed(Group group, int keyCode, int scanCode, int modifiers) {
         CustomEditBox weightField = editBoxMap.get(group);
         if (weightField != null && weightField.isFocused()) {
             return weightField.keyPressed(keyCode, scanCode, modifiers);
         }
 
-        // Handle subgroups
         if (group.isExpanded()) {
             for (GroupItem subGroup : group.getSubGroups()) {
                 if (subGroup instanceof BaseItem) {
@@ -192,75 +180,6 @@ public class GroupUI {
                     }
                 } else if (subGroup instanceof Group) {
                     if (keyPressed((Group) subGroup, keyCode, scanCode, modifiers)) {
-                        return true;
-                    }
-                }
-            }
-        }
-        return false;
-    }
-
-    public static boolean keyReleased(Group group, int keyCode, int scanCode, int modifiers) {
-        CustomEditBox weightField = editBoxMap.get(group);
-        if (weightField != null && weightField.isFocused()) {
-            return weightField.keyReleased(keyCode, scanCode, modifiers);
-        }
-
-        // Handle subgroups
-        if (group.isExpanded()) {
-            for (GroupItem subGroup : group.getSubGroups()) {
-                if (subGroup instanceof BaseItem) {
-                    if (BaseItemUI.keyReleased((BaseItem) subGroup, keyCode, scanCode, modifiers)) {
-                        return true;
-                    }
-                } else if (subGroup instanceof Group) {
-                    if (keyReleased((Group) subGroup, keyCode, scanCode, modifiers)) {
-                        return true;
-                    }
-                }
-            }
-        }
-        return false;
-    }
-
-    public static boolean mouseScrolled(Group group, double mouseX, double mouseY, double delta) {
-        CustomEditBox weightField = editBoxMap.get(group);
-        if (weightField != null && weightField.isFocused()) {
-            return weightField.mouseScrolled(mouseX, mouseY, delta);
-        }
-
-        // Handle subgroups
-        if (group.isExpanded()) {
-            for (GroupItem subGroup : group.getSubGroups()) {
-                if (subGroup instanceof BaseItem) {
-                    if (BaseItemUI.mouseScrolled((BaseItem) subGroup, mouseX, mouseY, delta)) {
-                        return true;
-                    }
-                } else if (subGroup instanceof Group) {
-                    if (mouseScrolled((Group) subGroup, mouseX, mouseY, delta)) {
-                        return true;
-                    }
-                }
-            }
-        }
-        return false;
-    }
-
-    public static boolean mouseDragged(Group group, double mouseX, double mouseY, int button, double deltaX, double deltaY) {
-        CustomEditBox weightField = editBoxMap.get(group);
-        if (weightField != null && weightField.isFocused()) {
-            return weightField.mouseDragged(mouseX, mouseY, button, deltaX, deltaY);
-        }
-
-        // Handle subgroups
-        if (group.isExpanded()) {
-            for (GroupItem subGroup : group.getSubGroups()) {
-                if (subGroup instanceof BaseItem) {
-                    if (BaseItemUI.mouseDragged((BaseItem) subGroup, mouseX, mouseY, button, deltaX, deltaY)) {
-                        return true;
-                    }
-                } else if (subGroup instanceof Group) {
-                    if (mouseDragged((Group) subGroup, mouseX, mouseY, button, deltaX, deltaY)) {
                         return true;
                     }
                 }

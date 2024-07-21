@@ -1,6 +1,6 @@
 package net.khofo.encumber.events;
 
-import net.khofo.encumber.overlays.WeightEditScreen;
+import net.khofo.encumber.UIElements.WeightEditScreen;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.Options;

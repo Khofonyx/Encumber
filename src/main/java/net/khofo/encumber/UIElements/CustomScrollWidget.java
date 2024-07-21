@@ -1,4 +1,4 @@
-package net.khofo.encumber.overlays;
+package net.khofo.encumber.UIElements;
 
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractScrollWidget;
@@ -11,27 +11,44 @@ import java.util.List;
 
 
 public class CustomScrollWidget extends AbstractScrollWidget {
+    /**
+     * scrollAmount: variable to keep track of how many pixels you've scrolled down
+     * scrolling: whether or not you are scrolling.
+     * dropdownMenu's: a list of dropdowns present in the scroll widget
+     */
     private double scrollAmount;
     private boolean scrolling;
-
     private final List<DropdownMenu> dropdownMenus;
 
+    /**
+     * Default constructor to create a scroll widget
+     */
     public CustomScrollWidget(int pX, int pY, int pWidth, int pHeight, Component pMessage) {
         super(pX, pY, pWidth, pHeight, pMessage);
         dropdownMenus = new ArrayList<>();
     }
 
+    /**
+     * method to add a dropdown menu to the dropdownMenu's list
+     */
     public void addDropdownMenu(DropdownMenu dropdownMenu) {
         dropdownMenus.add(dropdownMenu);
     }
 
+
+
+    /**
+     * method to
+     */
     @Override
     protected int getInnerHeight() {
         int height = 0;
         for (DropdownMenu menu : dropdownMenus) {
             height += menu.calculateHeight();
         }
-        return (height + 300) / 2;
+        /* =======================================================BLACK MAGIC =====================================================
+         I DON'T KNOW WHY I HAVE TO ADD THIS.HEIGHT AND DIVIDE BY 2 BUT IT WORKS */
+        return (height + this.height  + 20)/2;
     }
 
 
@@ -50,19 +67,7 @@ public class CustomScrollWidget extends AbstractScrollWidget {
         System.out.println("Starting render at Y: " + y + " with scroll amount: " + this.scrollAmount() + " startY: " + startY + " endY: " + endY);
 
         for (DropdownMenu menu : dropdownMenus) {
-            int menuHeight = menu.calculateHeight();
-            System.out.println("Menu height: " + menuHeight + ", Current Y: " + y);
-
-            // Check if the menu is within the visible area
-            if (y + menuHeight > startY && y < endY) {
-                System.out.println("Rendering menu at Y: " + y);
-                int previousY = y;
-                y = menu.render(this.getX(), y, this.getX() + 165, indent, pGuiGraphics, scrollAmount);
-                System.out.println("Rendered menu from Y: " + previousY + " to Y: " + y);
-            } else {
-                System.out.println("Skipping menu at Y: " + y + " with height: " + menuHeight);
-                y += menuHeight;
-            }
+            y = menu.render(this.getX(), y, this.getX() + 165, indent, pGuiGraphics, scrollAmount);
         }
     }
 
@@ -168,15 +173,6 @@ public class CustomScrollWidget extends AbstractScrollWidget {
         }
     }
 
-    /*private int getScrollBarHeight() {
-        int innerHeight = this.getInnerHeight();
-        if (innerHeight == 0) {
-            return 0;
-        } else {
-            return Math.max(32, this.height * this.height / innerHeight);
-        }
-    }*/
-
     private int getScrollBarHeight() {
         return Mth.clamp((int)((float)(this.height * this.height) / (float)this.getInnerHeight()), 32, this.height);
     }
@@ -215,14 +211,15 @@ public class CustomScrollWidget extends AbstractScrollWidget {
     }
 
     private void renderScrollBar1(GuiGraphics pGuiGraphics) {
-        if (this.scrollbarVisible()) {
-            int scrollbarXStart = this.getX() + this.getWidth();
-            int scrollbarXEnd = scrollbarXStart + 6;
-            int scrollbarYStart = this.getY() + (int) (this.scrollAmount * (this.height - this.getScrollBarHeight()) / this.getMaxScrollAmount());
-            int scrollbarYEnd = scrollbarYStart + this.getScrollBarHeight();
-            pGuiGraphics.fillGradient(scrollbarXStart, scrollbarYStart, scrollbarXEnd, scrollbarYEnd, 0xFFAAAAAA, 0xFF888888);
-        }
+        int i = this.getScrollBarHeight();
+        int j = this.getX() + this.width;
+        int k = this.getX() + this.width + 8;
+        int l = Math.max(this.getY(), (int)this.scrollAmount * (this.height - i) / this.getMaxScrollAmount() + this.getY());
+        int i1 = l + i;
+        pGuiGraphics.fill(j, l, k, i1, -8355712);
+        pGuiGraphics.fill(j, l, k - 1, i1 - 1, -4144960);
     }
+
     protected boolean scrollbarVisible() {
         return this.height < this.getInnerHeight();
     }

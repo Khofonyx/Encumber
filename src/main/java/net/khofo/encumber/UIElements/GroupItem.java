@@ -1,4 +1,4 @@
-package net.khofo.encumber.overlays;
+package net.khofo.encumber.UIElements;
 // Define the interface
 public interface GroupItem {
     double getWeight();

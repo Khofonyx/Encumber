@@ -1,4 +1,4 @@
-package net.khofo.encumber.overlays;
+package net.khofo.encumber.UIElements;
 
 import net.minecraft.SharedConstants;
 import net.minecraft.Util;
@@ -26,9 +26,7 @@ import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
 
-
 public class CustomEditBox extends EditBox {
-    //private static final Pattern VALID_INPUT_PATTERN = Pattern.compile("^\\d*(\\.\\d{0,4})?$");
     private static final Pattern VALID_INPUT_PATTERN = Pattern.compile("^\\d*(\\.\\d*)?$");
     private Font font;
     /** Has the current text being edited on the textbox. */
@@ -64,16 +62,6 @@ public class CustomEditBox extends EditBox {
         super(pFont, pX, pY, pWidth, pHeight, pMessage);
         this.font = pFont;
         this.setFilter(this::isValidNumber);
-    }
-
-    public CustomEditBox(Font pFont, int pX, int pY, int pWidth, int pHeight, @Nullable CustomEditBox pEditBox, Component pMessage) {
-        super(pFont, pX, pY, pWidth, pHeight, pMessage);
-        this.font = pFont;
-        if (pEditBox != null) {
-            this.setValue(pEditBox.getValue());
-        }
-        this.setFilter(this::isValidNumber);
-
     }
 
     private boolean isValidNumber(String text) {

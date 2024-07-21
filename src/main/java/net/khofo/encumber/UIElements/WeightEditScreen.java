@@ -1,4 +1,4 @@
-package net.khofo.encumber.overlays;
+package net.khofo.encumber.UIElements;
 
 import net.khofo.encumber.groups.ItemGroups;
 import net.minecraft.client.gui.GuiGraphics;

@@ -1,8 +1,8 @@
 package net.khofo.encumber.groups;
 
 import net.khofo.encumber.Encumber;
-import net.khofo.encumber.overlays.BaseItem;
-import net.khofo.encumber.overlays.Group;
+import net.khofo.encumber.UIElements.BaseItem;
+import net.khofo.encumber.UIElements.Group;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.*;
 import net.minecraftforge.registries.ForgeRegistries;
