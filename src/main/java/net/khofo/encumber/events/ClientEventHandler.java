@@ -1,9 +1,11 @@
 package net.khofo.encumber.events;
 
 import net.khofo.encumber.UIElements.WeightEditScreen;
+import net.khofo.encumber.configs.CommonConfigs;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.Options;
+import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.network.chat.Component;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.InputEvent;
@@ -34,7 +36,16 @@ public class ClientEventHandler {
         @SubscribeEvent
         public static void onKeyInput(InputEvent.Key event) {
             if (OPEN_WEIGHT_EDIT_SCREEN_KEY.consumeClick()) {
-                Minecraft.getInstance().setScreen(new WeightEditScreen(Component.literal("Edit Item Weights")));
+                if (WeightEvent.getThresholdTF(CommonConfigs.LOCK_GUI_TO_CREATIVE)){
+                    LocalPlayer player = Minecraft.getInstance().player;
+                    if(player.isCreative()){
+                        Minecraft.getInstance().setScreen(new WeightEditScreen(Component.literal("Edit Item Weights")));
+                    }else{
+                        System.out.println("Player not in creative mode, failed to open GUI");
+                    }
+                }else{
+                    Minecraft.getInstance().setScreen(new WeightEditScreen(Component.literal("Edit Item Weights")));
+                }
             }
         }
     }

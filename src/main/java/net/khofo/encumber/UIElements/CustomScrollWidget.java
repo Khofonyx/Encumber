@@ -59,15 +59,29 @@ public class CustomScrollWidget extends AbstractScrollWidget {
 
     @Override
     protected void renderContents(GuiGraphics pGuiGraphics, int pMouseX, int pMouseY, float pPartialTick) {
-        int startY = this.getY();
-        int endY = this.getY() + this.height;
-        int y = startY - (int) this.scrollAmount(); // Adjust starting Y position based on scroll amount
-        int indent = 20;
-
-        System.out.println("Starting render at Y: " + y + " with scroll amount: " + this.scrollAmount() + " startY: " + startY + " endY: " + endY);
-
+        int yTop = this.getY();
+        int yBottom = this.getY() + this.height;
+        int y = this.getY() - (int) this.scrollAmount(); // Adjust starting Y position based on scroll amount
+        //System.out.println("Y: " + y);
+        //System.out.println("Scroll Amount: " + this.scrollAmount());
         for (DropdownMenu menu : dropdownMenus) {
-            y = menu.render(this.getX(), y, this.getX() + 165, indent, pGuiGraphics, scrollAmount);
+            // if Attempted render Y is less than topY, don't render it
+            // if Attempted render Y is greater than bottomY don't render it
+
+
+            /*
+            ====================================== Y is the problem ============================
+             */
+
+
+            System.out.println("Y: " + y);
+            System.out.println("TopY: " + yTop);
+            System.out.println("BottomY: " + yBottom);
+            if (y < yTop && y > yBottom){
+                System.out.println("NOT RENDERING BC OUT OF BOUNDS");
+            }else{
+                y = menu.render(this.getX(), y, this.getX() + 165, 20, pGuiGraphics, scrollAmount);
+            }
         }
     }
 

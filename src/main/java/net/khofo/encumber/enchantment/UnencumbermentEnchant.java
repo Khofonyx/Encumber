@@ -1,6 +1,5 @@
 package net.khofo.encumber.enchantment;
 
-import net.khofo.encumber.configs.Configs;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.ItemStack;

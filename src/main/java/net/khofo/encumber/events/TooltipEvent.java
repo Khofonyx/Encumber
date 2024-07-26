@@ -1,19 +1,16 @@
 package net.khofo.encumber.events;
 
-import net.khofo.encumber.Encumber;
-import net.khofo.encumber.configs.Configs;
+import net.khofo.encumber.configs.CommonConfigs;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraftforge.event.entity.player.ItemTooltipEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 
 import java.util.List;
-import java.util.Map;
 
 import static net.khofo.encumber.Encumber.itemWeights;
 
@@ -31,8 +28,8 @@ public class TooltipEvent {
         }
 
         // Display boost item amount
-        List<String> boostItems = Configs.BOOST_ITEMS.get();
-        List<Double> boostItemAmounts = Configs.BOOST_ITEMS_AMOUNT.get();
+        List<String> boostItems = CommonConfigs.BOOST_ITEMS.get();
+        List<Double> boostItemAmounts = CommonConfigs.BOOST_ITEMS_AMOUNT.get();
         int boostItemIndex = boostItems.indexOf(itemId.toString());
         if (boostItemIndex != -1) {
             double boostAmount = boostItemAmounts.get(boostItemIndex);
@@ -40,8 +37,8 @@ public class TooltipEvent {
             event.getToolTip().add(boostText);
         }
 
-        List<String> boostArmors = Configs.BOOST_ARMORS.get();
-        List<Double> boostArmorAmounts = Configs.BOOST_ARMORS_AMOUNT.get();
+        List<String> boostArmors = CommonConfigs.BOOST_ARMORS.get();
+        List<Double> boostArmorAmounts = CommonConfigs.BOOST_ARMORS_AMOUNT.get();
         int boostArmorIndex = boostArmors.indexOf(itemId.toString());
         if (boostArmorIndex != -1) {
             double boostAmount = boostArmorAmounts.get(boostArmorIndex);

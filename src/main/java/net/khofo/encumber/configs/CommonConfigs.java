@@ -6,7 +6,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.function.Predicate;
 
-public class Configs {
+public class CommonConfigs {
     public static final ForgeConfigSpec.Builder BUILDER = new ForgeConfigSpec.Builder();
     public static final ForgeConfigSpec SPEC;
     public static final ForgeConfigSpec.ConfigValue<List<String>> CONTAINERS;
@@ -19,23 +19,16 @@ public class Configs {
     public static final ForgeConfigSpec.ConfigValue<Double> JUMPING_THRESHOLD;
     public static final ForgeConfigSpec.ConfigValue<Double> ENCUMBERED_THRESHOLD_MULTIPLIER;
     public static final ForgeConfigSpec.ConfigValue<Double> OVER_ENCUMBERED_THRESHOLD;
-    public static final ForgeConfigSpec.ConfigValue<Double> WEIGHT_UI_X_OFFSET;
-    public static final ForgeConfigSpec.ConfigValue<Double> WEIGHT_UI_Y_OFFSET;
-
-    public static final ForgeConfigSpec.ConfigValue<Integer> ANVIL_UI_X_OFFSET;
-    public static final ForgeConfigSpec.ConfigValue<Integer> ANVIL_UI_Y_OFFSET;
     public static final ForgeConfigSpec.ConfigValue<Boolean> ALLOW_MULTIPLE_BOOST_ITEMS;
     public static final ForgeConfigSpec.ConfigValue<Boolean> RIDING_FLYING_JUMPING_TIED_TO_OVER_ENCUMBERED_THRESHOLD;
     public static final ForgeConfigSpec.ConfigValue<Boolean> SINK_IN_WATER_LAVA;
-    public static final ForgeConfigSpec.ConfigValue<Boolean> TOGGLE_ANVIL_ICON;
-    public static final ForgeConfigSpec.ConfigValue<Boolean> TOGGLE_WEIGHT_TEXT;
+    public static final ForgeConfigSpec.ConfigValue<Boolean> LOCK_GUI_TO_CREATIVE;
     public static final ForgeConfigSpec.ConfigValue<Double> UNENCUMBERMENT_LEVEL1_MULTIPLIER;
     public static final ForgeConfigSpec.ConfigValue<Double> UNENCUMBERMENT_LEVEL2_MULTIPLIER;
     public static final ForgeConfigSpec.ConfigValue<Double> UNENCUMBERMENT_LEVEL3_MULTIPLIER;
-    public static final ForgeConfigSpec.ConfigValue<Boolean> DISABLE_ENCHANTS;
 
     static {
-        BUILDER.push("Configs for Encumbered:");
+        BUILDER.push("Common Configs for Encumbered:");
 
         // Define predicates for the list elements
         Predicate<Object> stringValidator = obj -> obj instanceof String;
@@ -80,39 +73,21 @@ public class Configs {
         OVER_ENCUMBERED_THRESHOLD = BUILDER.comment("\nIf weight is above this, you get slowness 5, cannot jump, and cannot sprint (Negative values will break the mod) default: 100")
                 .define("over_encumbered_threshold", 100.0D);
 
-        WEIGHT_UI_Y_OFFSET = BUILDER.comment("\nSet the vertical offset for the UI that shows your weight, default is 10% from the top (near the bottom of the screen). default: 10")
-                .define("weight_ui_y_offset", 10D);
-
-        WEIGHT_UI_X_OFFSET = BUILDER.comment("\nSet the horizontal offset for the UI that shows your weight, default is 50% from the left (centered horizontally). default: 50")
-                .define("weight_ui_x_offset", 50D);
-
-        ANVIL_UI_Y_OFFSET = BUILDER.comment("\nSet the vertical offset for the anvil UI. default: 0")
-                .define("anvil_ui_y_offset", 0);
-
-        ANVIL_UI_X_OFFSET = BUILDER.comment("\nSet the horizontal offset for the anvil UI. default: 0")
-                .define("anvil_ui_x_offset", 0);
-
         ALLOW_MULTIPLE_BOOST_ITEMS = BUILDER.comment("\nWhether or not boost item's additional capacities stack. If there are multiple boost items present in your inventory and this is false, it chooses the better boost item. default: true")
                 .define("allow_multiple_boost_items", true);
 
         SINK_IN_WATER_LAVA = BUILDER.comment("\nWhether or not the player sinks in WATER and LAVA while OVER_ENCUMBERED. default: true")
                 .define("sink_in_water_and_lava", true);
 
-        TOGGLE_ANVIL_ICON = BUILDER.comment("\nWhether or not the anvil icon appears. default: true")
-                .define("toggle_anvil_icon", true);
+        LOCK_GUI_TO_CREATIVE = BUILDER.comment("\nIf set to true, only players in creative mode can open the weight edit GUI. default: false")
+                .define("lock_gui_to_creative", true);
 
-        TOGGLE_WEIGHT_TEXT = BUILDER.comment("\nWhether or not the weight text appears. default: true")
-                .define("toggle_weight_text", true);
-
-        UNENCUMBERMENT_LEVEL1_MULTIPLIER = BUILDER.comment("\nMultiplier for Unencumberment Level 1 (Pick a value between 1 and 100)")
+        UNENCUMBERMENT_LEVEL1_MULTIPLIER = BUILDER.comment("\nMultiplier for Unencumberment Level 1")
                 .defineInRange("unencumberment_level_1_multiplier", 1.1, 1, 100.0);
-        UNENCUMBERMENT_LEVEL2_MULTIPLIER = BUILDER.comment("\nMultiplier for Unencumberment Level 2 (Pick a value between 1 and 100)")
+        UNENCUMBERMENT_LEVEL2_MULTIPLIER = BUILDER.comment("\nMultiplier for Unencumberment Level 2")
                 .defineInRange("unencumberment_level_2_multiplier", 1.25, 1, 100.0);
-        UNENCUMBERMENT_LEVEL3_MULTIPLIER = BUILDER.comment("\nMultiplier for Unencumberment Level 3 (Pick a value between 1 and 100)")
+        UNENCUMBERMENT_LEVEL3_MULTIPLIER = BUILDER.comment("\nMultiplier for Unencumberment Level 3")
                 .defineInRange("unencumberment_level_3_multiplier", 1.5, 1, 100.0);
-
-        DISABLE_ENCHANTS = BUILDER.comment("\nDisables Unencumberment enchant. default: false")
-                .define("disable_enchants", false);
 
         BUILDER.pop();
         SPEC = BUILDER.build();

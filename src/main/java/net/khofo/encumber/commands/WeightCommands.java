@@ -5,7 +5,7 @@ import com.mojang.brigadier.arguments.DoubleArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import net.khofo.encumber.Encumber;
-import net.khofo.encumber.configs.Configs;
+import net.khofo.encumber.configs.CommonConfigs;
 import net.khofo.encumber.groups.ItemGroups;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
@@ -17,7 +17,6 @@ import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.registries.ForgeRegistries;
 
-import java.awt.*;
 import java.util.List;
 import java.util.Map;
 
@@ -48,15 +47,32 @@ public class WeightCommands {
                                                 .executes(context -> {
                                                     String group = StringArgumentType.getString(context, "group").toUpperCase();
                                                     double weight = DoubleArgumentType.getDouble(context, "weight");
-                                                    return setGroupWeight(context, group, weight);}))))
-                        .then(Commands.literal("boost")
-                                .then(Commands.argument("item", ResourceLocationArgument.id())
-                                        .then(Commands.argument("amount", DoubleArgumentType.doubleArg())
-                                                .executes(context -> {
-                                                    ResourceLocation item = ResourceLocationArgument.getId(context, "item");
-                                                    double amount = DoubleArgumentType.getDouble(context, "amount");
-                                                    return boostItem(context, item, amount);
+                                                    return setGroupWeight(context, group, weight);
                                                 }))))
+                        .then(Commands.literal("boost")
+                                .then(Commands.literal("add")
+                                        .then(Commands.argument("item", ResourceLocationArgument.id())
+                                                .then(Commands.argument("amount", DoubleArgumentType.doubleArg())
+                                                        .executes(context -> {
+                                                            ResourceLocation item = ResourceLocationArgument.getId(context, "item");
+                                                            double amount = DoubleArgumentType.getDouble(context, "amount");
+                                                            return addBoostItem(context, item, amount);
+                                                        }))))
+                                .then(Commands.literal("remove")
+                                        .then(Commands.argument("item", ResourceLocationArgument.id())
+                                                .executes(context -> removeBoostItem(context, ResourceLocationArgument.getId(context, "item"))))))
+                        .then(Commands.literal("boost_armor")
+                                .then(Commands.literal("add")
+                                        .then(Commands.argument("item", ResourceLocationArgument.id())
+                                                .then(Commands.argument("amount", DoubleArgumentType.doubleArg())
+                                                        .executes(context -> {
+                                                            ResourceLocation item = ResourceLocationArgument.getId(context, "item");
+                                                            double amount = DoubleArgumentType.getDouble(context, "amount");
+                                                            return addBoostArmor(context, item, amount);
+                                                        }))))
+                                .then(Commands.literal("remove")
+                                        .then(Commands.argument("item", ResourceLocationArgument.id())
+                                                .executes(context -> removeBoostArmor(context, ResourceLocationArgument.getId(context, "item"))))))
                         .then(Commands.literal("threshold")
                                 .then(Commands.literal("encumbered")
                                         .then(Commands.argument("value", DoubleArgumentType.doubleArg())
@@ -71,7 +87,10 @@ public class WeightCommands {
                                     context.getSource().sendSuccess(() -> Component.literal("/weight get <item> - Gets the weight of a item. <item> should be the registry name (Ex. minecraft:stone)"), true);
                                     context.getSource().sendSuccess(() -> Component.literal("/weight set <item> <weight> - Sets the weight of a specified item"), true);
                                     context.getSource().sendSuccess(() -> Component.literal("/weight setgroup <group> <weight> - Sets the weight for a predefined group of items"), true);
-                                    context.getSource().sendSuccess(() -> Component.literal("/weight boost <item> <amount> - Creates a boost item"), true);
+                                    context.getSource().sendSuccess(() -> Component.literal("/weight boost add <item> <amount> - Creates a boost item"), true);
+                                    context.getSource().sendSuccess(() -> Component.literal("/weight boost remove <item> - Removes a boost item"), true);
+                                    context.getSource().sendSuccess(() -> Component.literal("/weight boost_armor add <item> <amount> - Creates a boost armor item"), true);
+                                    context.getSource().sendSuccess(() -> Component.literal("/weight boost_armor remove <item> - Removes a boost armor item"), true);
                                     context.getSource().sendSuccess(() -> Component.literal("/weight threshold encumbered <value> - Sets the encumbered (yellow) multiplier"), true);
                                     context.getSource().sendSuccess(() -> Component.literal("/weight threshold over_encumbered <value> - Sets the over_encumbered (red) threshold"), true);
                                     return 1;
@@ -80,13 +99,13 @@ public class WeightCommands {
     }
 
     private static int setEncumberedThreshold(CommandContext<CommandSourceStack> context, double value) {
-        Configs.ENCUMBERED_THRESHOLD_MULTIPLIER.set(value);
+        CommonConfigs.ENCUMBERED_THRESHOLD_MULTIPLIER.set(value);
         context.getSource().sendSuccess(() -> Component.literal("Set Encumbered Multiplier To: " + value), true);
         return 1;
     }
 
     private static int setOverEncumberedThreshold(CommandContext<CommandSourceStack> context, double value) {
-        Configs.OVER_ENCUMBERED_THRESHOLD.set(value);
+        CommonConfigs.OVER_ENCUMBERED_THRESHOLD.set(value);
         context.getSource().sendSuccess(() -> Component.literal("Set Over_Encumbered Threshold To: " + value), true);
         return 1;
     }
@@ -94,9 +113,9 @@ public class WeightCommands {
 
 
 
-    private static int boostItem(CommandContext<CommandSourceStack> context, ResourceLocation item, double amount) {
-        List<String> boostItems = Configs.BOOST_ITEMS.get();
-        List<Double> boostAmounts = Configs.BOOST_ITEMS_AMOUNT.get();
+    private static int addBoostItem(CommandContext<CommandSourceStack> context, ResourceLocation item, double amount) {
+        List<String> boostItems = CommonConfigs.BOOST_ITEMS.get();
+        List<Double> boostAmounts = CommonConfigs.BOOST_ITEMS_AMOUNT.get();
 
         String itemName = item.toString();
 
@@ -108,10 +127,76 @@ public class WeightCommands {
             boostAmounts.set(index, amount);
         }
 
-        Configs.BOOST_ITEMS.set(boostItems);
-        Configs.BOOST_ITEMS_AMOUNT.set(boostAmounts);
+        CommonConfigs.BOOST_ITEMS.set(boostItems);
+        CommonConfigs.BOOST_ITEMS_AMOUNT.set(boostAmounts);
 
         context.getSource().sendSuccess(() -> Component.literal("Successfully made " + itemName + " a boost item with boost amount: " + amount), true);
+
+        return 1;
+    }
+
+    private static int removeBoostItem(CommandContext<CommandSourceStack> context, ResourceLocation item) {
+        List<String> boostItems = CommonConfigs.BOOST_ITEMS.get();
+        List<Double> boostAmounts = CommonConfigs.BOOST_ITEMS_AMOUNT.get();
+
+        String itemName = item.toString();
+
+        if (boostItems.contains(itemName)) {
+            int index = boostItems.indexOf(itemName);
+            boostItems.remove(index);
+            boostAmounts.remove(index);
+
+            CommonConfigs.BOOST_ITEMS.set(boostItems);
+            CommonConfigs.BOOST_ITEMS_AMOUNT.set(boostAmounts);
+
+            context.getSource().sendSuccess(() -> Component.literal("Successfully removed " + itemName + " from boost items."), true);
+        } else {
+            context.getSource().sendFailure(Component.literal("Item " + itemName + " is not in the boost items list."));
+        }
+
+        return 1;
+    }
+
+    private static int addBoostArmor(CommandContext<CommandSourceStack> context, ResourceLocation item, double amount) {
+        List<String> boostArmors = CommonConfigs.BOOST_ARMORS.get();
+        List<Double> boostArmorsAmount = CommonConfigs.BOOST_ARMORS_AMOUNT.get();
+
+        String itemName = item.toString();
+
+        if (!boostArmors.contains(itemName)) {
+            boostArmors.add(itemName);
+            boostArmorsAmount.add(amount);
+        } else {
+            int index = boostArmors.indexOf(itemName);
+            boostArmorsAmount.set(index, amount);
+        }
+
+        CommonConfigs.BOOST_ARMORS.set(boostArmors);
+        CommonConfigs.BOOST_ARMORS_AMOUNT.set(boostArmorsAmount);
+
+        context.getSource().sendSuccess(() -> Component.literal("Successfully made " + itemName + " a boost armor with boost amount: " + amount), true);
+
+        return 1;
+    }
+
+    private static int removeBoostArmor(CommandContext<CommandSourceStack> context, ResourceLocation item) {
+        List<String> boostArmors = CommonConfigs.BOOST_ARMORS.get();
+        List<Double> boostArmorsAmount = CommonConfigs.BOOST_ARMORS_AMOUNT.get();
+
+        String itemName = item.toString();
+
+        if (boostArmors.contains(itemName)) {
+            int index = boostArmors.indexOf(itemName);
+            boostArmors.remove(index);
+            boostArmorsAmount.remove(index);
+
+            CommonConfigs.BOOST_ARMORS.set(boostArmors);
+            CommonConfigs.BOOST_ARMORS_AMOUNT.set(boostArmorsAmount);
+
+            context.getSource().sendSuccess(() -> Component.literal("Successfully removed " + itemName + " from boost armors."), true);
+        } else {
+            context.getSource().sendFailure(Component.literal("Item " + itemName + " is not in the boost armors list."));
+        }
 
         return 1;
     }

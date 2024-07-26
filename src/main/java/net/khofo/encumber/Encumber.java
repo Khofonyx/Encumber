@@ -5,7 +5,8 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 import com.mojang.logging.LogUtils;
 import net.khofo.encumber.commands.WeightCommands;
-import net.khofo.encumber.configs.Configs;
+import net.khofo.encumber.configs.ClientConfigs;
+import net.khofo.encumber.configs.CommonConfigs;
 import net.khofo.encumber.enchantment.UnencumbermentEnchant;
 import net.khofo.encumber.events.ClientEventHandler;
 import net.khofo.encumber.events.TooltipEvent;
@@ -65,7 +66,8 @@ public class Encumber {
         MinecraftForge.EVENT_BUS.register(new WeightEvent());
         modEventBus.addListener(this::commonSetup);
         MinecraftForge.EVENT_BUS.register(this);
-        ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, Configs.SPEC, "encumber-common.toml");
+        ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, CommonConfigs.SPEC, "encumber-common.toml");
+        ModLoadingContext.get().registerConfig(ModConfig.Type.CLIENT, ClientConfigs.CLIENT_SPEC, "encumber-client.toml");
         MinecraftForge.EVENT_BUS.register(ClientEventHandler.KeyInputHandler.class);
         ENCHANTMENTS.register(FMLJavaModLoadingContext.get().getModEventBus());
     }

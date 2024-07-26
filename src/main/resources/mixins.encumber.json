@@ -3,9 +3,9 @@
   "package": "net.khofo.encumber.mixins",
   "compatibilityLevel": "JAVA_17",
   "refmap": "mixins.encumber.refmap.json",
-  "mixins": [
-    "PlayerMixin",
-    "LocalPlayerInvoker"
+  "client": [
+    "LocalPlayerInvoker",
+    "PlayerMixin"
   ],
   "injectors": {
     "defaultRequire": 1

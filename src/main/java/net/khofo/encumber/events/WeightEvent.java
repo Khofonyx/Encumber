@@ -1,22 +1,20 @@
 package net.khofo.encumber.events;
 
 import net.khofo.encumber.Encumber;
-import net.khofo.encumber.configs.Configs;
-import net.khofo.encumber.accessors.LivingEntityAccessor;
+import net.khofo.encumber.configs.CommonConfigs;
 import net.khofo.encumber.mixins.LocalPlayerInvoker;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.tags.FluidTags;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
-import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.animal.Pig;
 import net.minecraft.world.entity.animal.horse.AbstractHorse;
 import net.minecraft.world.entity.animal.horse.Llama;
@@ -25,7 +23,6 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.vehicle.AbstractMinecart;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
-import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.common.ForgeMod;
@@ -33,7 +30,6 @@ import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.living.LivingEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
-import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 
 import java.util.ArrayList;
@@ -77,13 +73,13 @@ public class WeightEvent {
         if (event.getEntity() instanceof Player) {
             Player player = (Player) event.getEntity();
             if (!player.isSpectator() && !player.isCreative()) {
-                if(getThresholdTF(Configs.RIDING_FLYING_JUMPING_TIED_TO_OVER_ENCUMBERED_THRESHOLD)){
+                if(getThresholdTF(CommonConfigs.RIDING_FLYING_JUMPING_TIED_TO_OVER_ENCUMBERED_THRESHOLD)){
                     if (calculateWeight(player) >= getWeightWithBoostItem(player,1)) {
                         player.setDeltaMovement(0, 0, 0);
                         player.hasImpulse = true;
                     }
                 }else{
-                    if (calculateWeight(player) >= getThreshold(Configs.JUMPING_THRESHOLD)) {
+                    if (calculateWeight(player) >= getThreshold(CommonConfigs.JUMPING_THRESHOLD)) {
                         player.setDeltaMovement(0, 0, 0);
                         player.hasImpulse = true;
                     }
@@ -93,11 +89,11 @@ public class WeightEvent {
     }
 
     public static double getWeightWithBoostItem(Player player, int slownessLevel) {
-        double baseThreshold = getThreshold(Configs.OVER_ENCUMBERED_THRESHOLD);
+        double baseThreshold = getThreshold(CommonConfigs.OVER_ENCUMBERED_THRESHOLD);
         if (slownessLevel == 0) {
-            baseThreshold = (baseThreshold + getBoostItemAmount(player)) * (getThreshold(Configs.ENCUMBERED_THRESHOLD_MULTIPLIER) / 100);
+            baseThreshold = (baseThreshold + getBoostItemAmount(player)) * (getThreshold(CommonConfigs.ENCUMBERED_THRESHOLD_MULTIPLIER) / 100);
         } else if (slownessLevel == 1) {
-            baseThreshold = getThreshold(Configs.OVER_ENCUMBERED_THRESHOLD) + getBoostItemAmount(player);
+            baseThreshold = getThreshold(CommonConfigs.OVER_ENCUMBERED_THRESHOLD) + getBoostItemAmount(player);
         }
 
         // Add the boost item amount to the base threshold
@@ -120,20 +116,20 @@ public class WeightEvent {
 
     private static double getCarryingCapacityBoost(int level) {
         return switch (level) {
-            case 1 -> Configs.UNENCUMBERMENT_LEVEL1_MULTIPLIER.get();
-            case 2 -> Configs.UNENCUMBERMENT_LEVEL2_MULTIPLIER.get();
-            case 3 -> Configs.UNENCUMBERMENT_LEVEL3_MULTIPLIER.get();
+            case 1 -> CommonConfigs.UNENCUMBERMENT_LEVEL1_MULTIPLIER.get();
+            case 2 -> CommonConfigs.UNENCUMBERMENT_LEVEL2_MULTIPLIER.get();
+            case 3 -> CommonConfigs.UNENCUMBERMENT_LEVEL3_MULTIPLIER.get();
             default -> 1.0;
         };
     }
 
     public static double getBoostItemAmount(Player player) {
         double maxBoostAmount = 0.0;
-        List<String> boostItems = Configs.BOOST_ITEMS.get();
-        List<String> boostArmors = Configs.BOOST_ARMORS.get();
-        List<Double> boostItemAmounts = Configs.BOOST_ITEMS_AMOUNT.get();
-        List<Double> boostArmorAmounts = Configs.BOOST_ARMORS_AMOUNT.get();
-        Boolean allowMultipleBoostItems = getThresholdTF(Configs.ALLOW_MULTIPLE_BOOST_ITEMS);
+        List<String> boostItems = CommonConfigs.BOOST_ITEMS.get();
+        List<String> boostArmors = CommonConfigs.BOOST_ARMORS.get();
+        List<Double> boostItemAmounts = CommonConfigs.BOOST_ITEMS_AMOUNT.get();
+        List<Double> boostArmorAmounts = CommonConfigs.BOOST_ARMORS_AMOUNT.get();
+        Boolean allowMultipleBoostItems = getThresholdTF(CommonConfigs.ALLOW_MULTIPLE_BOOST_ITEMS);
 
         if (allowMultipleBoostItems) {
             // Check inventory, armor, and offhand for multiple boost items
@@ -188,7 +184,7 @@ public class WeightEvent {
         ResourceLocation itemId = BuiltInRegistries.ITEM.getKey(stack.getItem());
         for (int i = 0; i < boostItems.size(); i++) {
             if (itemId != null && itemId.toString().equals(boostItems.get(i))) {
-                if (getThresholdTF(Configs.ALLOW_MULTIPLE_BOOST_ITEMS)){
+                if (getThresholdTF(CommonConfigs.ALLOW_MULTIPLE_BOOST_ITEMS)){
                     return boostAmounts.get(i) * stack.getCount();
                 }else{
                     return boostAmounts.get(i);
@@ -209,21 +205,24 @@ public class WeightEvent {
             ResourceLocation itemId = BuiltInRegistries.ITEM.getKey(stack.getItem());
             double itemWeight = Encumber.getItemWeight(itemId);
             totalWeight += itemWeight * stack.getCount();
-            List<String> containerNames = Configs.CONTAINERS.get();
-            for (String containerName : containerNames) {
-                if (itemId.toString().equals(containerName)) {
-                    totalWeight += calculateContainerWeight(stack);
-                }
+            List<String> containerNames = CommonConfigs.CONTAINERS.get();
+            if (containerNames.contains(itemId.toString())){
+                totalWeight += calculateContainerWeight(stack);
             }
         }
         return totalWeight;
     }
 
     public static double calculateContainerWeight(ItemStack containerStack) {
+        Component displayNameComponent = containerStack.getDisplayName();
+        String displayName = displayNameComponent.getString();
+        System.out.println("Testing: " + displayName);
         final double[] containerWeight = {0.0};
-
+        Screen currentScreen = Minecraft.getInstance().screen;
+        System.out.println("Current Screen: " + currentScreen);
         // Check if the item stack has an inventory (is a container)
         containerStack.getCapability(ForgeCapabilities.ITEM_HANDLER).ifPresent(handler -> {
+            System.out.println("Found Inventory with " +handler.getSlots() + " slots");
             for (int i = 0; i < handler.getSlots(); i++) {
                 ItemStack stack = handler.getStackInSlot(i);
                 if (!stack.isEmpty()) {
@@ -232,11 +231,9 @@ public class WeightEvent {
                     containerWeight[0] += itemWeight * stack.getCount();
 
                     // Check if this item is also a container and calculate its contents' weight recursively
-                    List<String> containerNames = Configs.CONTAINERS.get();
-                    for (String containerName : containerNames) {
-                        if (itemId.toString().equals(containerName)) {
-                            containerWeight[0] += calculateContainerWeight(stack);
-                        }
+                    List<String> containerNames = CommonConfigs.CONTAINERS.get();
+                    if (containerNames.contains(itemId.toString())){
+                        containerWeight[0] += calculateContainerWeight(stack);
                     }
                 }
             }
@@ -245,12 +242,11 @@ public class WeightEvent {
     }
 
     private static void applyEffectsBasedOnWeight(Player player, double weight) {
-        if (weight >= getWeightWithBoostItem(player, 1) && getThreshold(Configs.OVER_ENCUMBERED_THRESHOLD) > -1) {
+        if (weight >= getWeightWithBoostItem(player, 1) && getThreshold(CommonConfigs.OVER_ENCUMBERED_THRESHOLD) > -1) {
             player.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 6, 4, false, false, false));
-            if (getThresholdTF(Configs.RIDING_FLYING_JUMPING_TIED_TO_OVER_ENCUMBERED_THRESHOLD)) {
+            if (getThresholdTF(CommonConfigs.RIDING_FLYING_JUMPING_TIED_TO_OVER_ENCUMBERED_THRESHOLD)) {
                 player.stopFallFlying();
-                //player.stopRiding();
-                if ((player.isInWater() || player.isInLava()) && getThresholdTF(Configs.SINK_IN_WATER_LAVA)){
+                if ((player.isInWater() || player.isInLava()) && getThresholdTF(CommonConfigs.SINK_IN_WATER_LAVA)){
                     boolean spacebarPressed = Minecraft.getInstance().options.keyJump.isDown();
                     if (spacebarPressed){
                         player.setDeltaMovement(new Vec3(0.0D, (double)-0.08F * player.getAttributeValue(ForgeMod.SWIM_SPEED.get()), 0.0D));
@@ -259,8 +255,7 @@ public class WeightEvent {
                     }
                 }
             }
-        } else if (weight >= getWeightWithBoostItem(player, 0) && getThreshold(Configs.ENCUMBERED_THRESHOLD_MULTIPLIER) > 0) {
-            //player.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 6, 1, false, false, false));
+        } else if (weight >= getWeightWithBoostItem(player, 0) && getThreshold(CommonConfigs.ENCUMBERED_THRESHOLD_MULTIPLIER) > 0) {
             if (player instanceof LocalPlayer) {
                 LocalPlayer localPlayer = (LocalPlayer) player;
                 boolean canSprint = ((LocalPlayerInvoker) localPlayer).invokeCanStartSprinting();
@@ -270,11 +265,10 @@ public class WeightEvent {
             }
         }
 
-        if(!getThresholdTF(Configs.RIDING_FLYING_JUMPING_TIED_TO_OVER_ENCUMBERED_THRESHOLD)){
-            if (weight >= getThreshold(Configs.FALL_FLYING_THRESHOLD) && getThreshold(Configs.FALL_FLYING_THRESHOLD) > -1) {
+        if(!getThresholdTF(CommonConfigs.RIDING_FLYING_JUMPING_TIED_TO_OVER_ENCUMBERED_THRESHOLD)){
+            if (weight >= getThreshold(CommonConfigs.FALL_FLYING_THRESHOLD) && getThreshold(CommonConfigs.FALL_FLYING_THRESHOLD) > -1) {
                 player.stopFallFlying();
             }
-            // Mounting is handled in OnEntityInteract
         }
     }
 
@@ -286,8 +280,8 @@ public class WeightEvent {
         // Check if the entity can be ridden
         if (!player.isSpectator() && !player.isCreative()) {
             if (canBeRidden(target)) {
-                if (getThresholdTF(Configs.RIDING_FLYING_JUMPING_TIED_TO_OVER_ENCUMBERED_THRESHOLD)) {
-                    if (calculateWeight(player) >= getWeightWithBoostItem(player, 1) && getThreshold(Configs.OVER_ENCUMBERED_THRESHOLD) > -1) {
+                if (getThresholdTF(CommonConfigs.RIDING_FLYING_JUMPING_TIED_TO_OVER_ENCUMBERED_THRESHOLD)) {
+                    if (calculateWeight(player) >= getWeightWithBoostItem(player, 1) && getThreshold(CommonConfigs.OVER_ENCUMBERED_THRESHOLD) > -1) {
                         if (isMountingAttempt(target, player, event.getHand())) {
                             if (!event.isCanceled()) { // Check if the event has not been canceled already
                                 event.setCanceled(true); // Cancel the event to prevent mounting
@@ -298,7 +292,7 @@ public class WeightEvent {
                         }
                     }
                 } else {
-                    if (calculateWeight(player) >= getThreshold(Configs.RIDING_THRESHOLD) && getThreshold(Configs.RIDING_THRESHOLD) > -1) {
+                    if (calculateWeight(player) >= getThreshold(CommonConfigs.RIDING_THRESHOLD) && getThreshold(CommonConfigs.RIDING_THRESHOLD) > -1) {
                         if (isMountingAttempt(target, player, event.getHand())) {
                             if (!event.isCanceled()) { // Check if the event has not been canceled already
                                 event.setCanceled(true); // Cancel the event to prevent mounting
