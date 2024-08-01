@@ -1,7 +1,10 @@
 package net.khofo.encumber.UIElements;
 
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
+@OnlyIn(Dist.CLIENT)
 public class DropdownMenu {
     /**
      * group: the group you are inserting into the dropdown menu.

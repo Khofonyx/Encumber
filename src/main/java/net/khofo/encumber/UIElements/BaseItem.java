@@ -4,8 +4,11 @@ package net.khofo.encumber.UIElements;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.registries.ForgeRegistries;
 
+@OnlyIn(Dist.CLIENT)
 public class BaseItem implements GroupItem {
     /**
      * name: the name of the BaseItem

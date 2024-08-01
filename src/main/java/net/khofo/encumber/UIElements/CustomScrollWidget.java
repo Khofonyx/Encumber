@@ -5,11 +5,14 @@ import net.minecraft.client.gui.components.AbstractScrollWidget;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.Mth;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
 import java.util.ArrayList;
 import java.util.List;
 
 
+@OnlyIn(Dist.CLIENT)
 public class CustomScrollWidget extends AbstractScrollWidget {
     /**
      * scrollAmount: variable to keep track of how many pixels you've scrolled down
@@ -20,12 +23,15 @@ public class CustomScrollWidget extends AbstractScrollWidget {
     private boolean scrolling;
     private final List<DropdownMenu> dropdownMenus;
 
+    private final List<BaseItem> baseItems;
+
     /**
      * Default constructor to create a scroll widget
      */
     public CustomScrollWidget(int pX, int pY, int pWidth, int pHeight, Component pMessage) {
         super(pX, pY, pWidth, pHeight, pMessage);
         dropdownMenus = new ArrayList<>();
+        baseItems = new ArrayList<>();
     }
 
     /**
@@ -35,6 +41,15 @@ public class CustomScrollWidget extends AbstractScrollWidget {
         dropdownMenus.add(dropdownMenu);
     }
 
+
+    public void addBaseItem(BaseItem baseItem) {
+        baseItems.add(baseItem);
+    }
+
+    public void clear() {
+        dropdownMenus.clear();
+        baseItems.clear();
+    }
 
 
     /**
@@ -48,6 +63,7 @@ public class CustomScrollWidget extends AbstractScrollWidget {
         }
         /* =======================================================BLACK MAGIC =====================================================
          I DON'T KNOW WHY I HAVE TO ADD THIS.HEIGHT AND DIVIDE BY 2 BUT IT WORKS */
+        height += baseItems.size() * 20;
         return (height + this.height  + 20)/2;
     }
 
@@ -65,6 +81,7 @@ public class CustomScrollWidget extends AbstractScrollWidget {
         //System.out.println("Y: " + y);
         //System.out.println("Scroll Amount: " + this.scrollAmount());
         for (DropdownMenu menu : dropdownMenus) {
+            y = menu.render(this.getX(), y, this.getX() + 165, 20, pGuiGraphics, scrollAmount);
             // if Attempted render Y is less than topY, don't render it
             // if Attempted render Y is greater than bottomY don't render it
 
@@ -74,14 +91,18 @@ public class CustomScrollWidget extends AbstractScrollWidget {
              */
 
 
-            System.out.println("Y: " + y);
-            System.out.println("TopY: " + yTop);
-            System.out.println("BottomY: " + yBottom);
-            if (y < yTop && y > yBottom){
-                System.out.println("NOT RENDERING BC OUT OF BOUNDS");
-            }else{
-                y = menu.render(this.getX(), y, this.getX() + 165, 20, pGuiGraphics, scrollAmount);
-            }
+            //System.out.println("Y: " + y);
+            //System.out.println("TopY: " + yTop);
+            //System.out.println("BottomY: " + yBottom);
+            //if (y < yTop && y > yBottom){
+                //System.out.println("NOT RENDERING BC OUT OF BOUNDS");
+           // }else{
+            //y = menu.render(this.getX(), y, this.getX() + 165, 20, pGuiGraphics, scrollAmount);
+            //}
+        }
+
+        for (BaseItem item : baseItems) {
+            y = BaseItemUI.renderBaseItem(item, this.getX(), y, this.getX() + 165, pGuiGraphics);
         }
     }
 
@@ -113,6 +134,14 @@ public class CustomScrollWidget extends AbstractScrollWidget {
             }
             y += menu.calculateHeight();
         }
+
+        for (BaseItem item : baseItems) {
+            if (BaseItemUI.mouseClicked(item, mouseX, mouseY, button, this.scrollAmount())) {
+                return true;
+            }
+            y += 20; // Assuming each BaseItem row height is 20
+        }
+
         return super.mouseClicked(mouseX, mouseY, button);
     }
 
@@ -167,6 +196,12 @@ public class CustomScrollWidget extends AbstractScrollWidget {
         for (DropdownMenu menu : dropdownMenus) {
             Group group = menu.getGroup();
             if (GroupUI.keyPressed(group, pKeyCode, pScanCode, pModifiers)) {
+                return true;
+            }
+        }
+
+        for (BaseItem item : baseItems) {
+            if (BaseItemUI.keyPressed(item, pKeyCode, pScanCode, pModifiers)) {
                 return true;
             }
         }
@@ -251,12 +286,21 @@ public class CustomScrollWidget extends AbstractScrollWidget {
                 return true;
             }
         }
+        for (BaseItem item : baseItems) {
+            if (BaseItemUI.charTyped(item, chr, modifiers)) {
+                return true;
+            }
+        }
         return super.charTyped(chr, modifiers);
     }
 
     public void tick() {
         for (DropdownMenu menu : dropdownMenus) {
-            menu.tick();
+            Group group = menu.getGroup();
+            GroupUI.tickGroup(group);
+        }
+        for (BaseItem item : baseItems) {
+            BaseItemUI.tickBaseItem(item);
         }
     }
 }

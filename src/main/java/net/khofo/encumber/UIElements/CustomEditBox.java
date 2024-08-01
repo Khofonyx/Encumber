@@ -18,6 +18,8 @@ import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.Style;
 import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.util.Mth;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
 import javax.annotation.Nullable;
 import java.util.Objects;
@@ -26,6 +28,7 @@ import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
 
+@OnlyIn(Dist.CLIENT)
 public class CustomEditBox extends EditBox {
     private static final Pattern VALID_INPUT_PATTERN = Pattern.compile("^\\d*(\\.\\d*)?$");
     private Font font;
