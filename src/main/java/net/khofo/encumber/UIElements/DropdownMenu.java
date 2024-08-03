@@ -29,9 +29,9 @@ public class DropdownMenu {
      * Method that renders the dropdown menu.
      * This calls GroupUI's render method which handles displaying either a BaseItem or another nested group.
      */
-    public int render(int x, int y, int weightX, int indent, GuiGraphics guiGraphics, double scrollAmount) {
+    public int render(int x, int y, int weightX, int indent, GuiGraphics guiGraphics, double scrollAmount,int mouseX,int mouseY) {
         // Call GroupUI's render method which handles rendering the UI for the elements inside of the group
-        return GroupUI.renderGroup(group, x, y, weightX, indent, guiGraphics, scrollAmount);
+        return GroupUI.renderGroup(group, x, y, weightX, indent, guiGraphics, scrollAmount,mouseX,mouseY);
     }
 
     /**

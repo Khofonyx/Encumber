@@ -17,7 +17,7 @@ import java.util.Map;
 @OnlyIn(Dist.CLIENT)
 public class GroupUI {
     private static final Map<Group, CustomEditBox> editBoxMap = new HashMap<>();
-    public static int renderGroup(Group group, int x, int y, int weightX, int indent, GuiGraphics guiGraphics, double scrollAmount) {
+    public static int renderGroup(Group group, int x, int y, int weightX, int indent, GuiGraphics guiGraphics, double scrollAmount,int mouseX,int mouseY) {
         Font font = Minecraft.getInstance().font;
 
         drawHitbox(guiGraphics, x, y, 200 - indent - 2, 18, 0x55808080);
@@ -41,10 +41,10 @@ public class GroupUI {
         if (group.isExpanded()) {
             for (GroupItem subGroup : group.getSubGroups()) {
                 if (subGroup instanceof BaseItem) {
-                    currentY = BaseItemUI.renderBaseItem((BaseItem) subGroup, x + indent, currentY, weightX, guiGraphics);
+                    currentY = BaseItemUI.renderBaseItem((BaseItem) subGroup, x + indent, currentY, weightX, guiGraphics,mouseX,mouseY,scrollAmount);
                 } else if (subGroup instanceof Group) {
                     int previousY = currentY;
-                    currentY = renderGroup((Group) subGroup, x + indent, currentY, weightX, indent, guiGraphics, scrollAmount);
+                    currentY = renderGroup((Group) subGroup, x + indent, currentY, weightX, indent, guiGraphics, scrollAmount,mouseX,mouseY);
                 }
             }
         }

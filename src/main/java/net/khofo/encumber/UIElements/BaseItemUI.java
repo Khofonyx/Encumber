@@ -5,6 +5,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.FormattedText;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -26,7 +27,7 @@ public class BaseItemUI {
      * method that renders the BaseItem's UI elements.
      * Renders the items picture, name, and edit box where you enter the weight.
      */
-    public static int renderBaseItem(BaseItem item, int x, int y, int weightX, GuiGraphics guiGraphics) {
+    public static int renderBaseItem(BaseItem item, int x, int y, int weightX, GuiGraphics guiGraphics, int mouseX, int mouseY,double scrollAmount) {
         // This renders the item name
         renderItemName(guiGraphics,font,item,x,y+5);
 
@@ -53,6 +54,17 @@ public class BaseItemUI {
         return y + 20;
     }
 
+    public static boolean isMouseOverItemName(int x, int y, Font font, BaseItem item, int mouseX, int mouseY,double scrollAmount) {
+        // Calculate width of the rendered item name
+        String fullItemName = item.getName();
+        String itemName = fullItemName.contains(":") ? fullItemName.split(":")[1] : fullItemName;
+        int itemNameWidth = font.width(itemName);
+
+        int adjustedY = y - (int)scrollAmount;
+        // Check if mouse is over the item name
+        return mouseX >= x && mouseX <= (x + itemNameWidth) && mouseY >= adjustedY && mouseY <= (adjustedY + font.lineHeight);
+    }
+
     /**
      * Helper method to render the item name
      */
@@ -61,10 +73,21 @@ public class BaseItemUI {
         String fullItemName = item.getName();
         // Splits the full name to everything after the ':' and saves it to itemName. Ex: minecraft:stone -> stone
         String itemName = fullItemName.contains(":") ? fullItemName.split(":")[1] : fullItemName;
+
+        int maxWidth = 118; // Maximum width for item name
+
+        // Create a FormattedText object from the item name
+        FormattedText formattedItemName = FormattedText.of(itemName);
+
+        // Truncate the name if it's too long
+        if (font.width(formattedItemName) > maxWidth) {
+            FormattedText truncatedItemName = font.substrByWidth(formattedItemName, maxWidth - font.width("..."));
+            itemName = truncatedItemName.getString() + "...";
+        }
+
         // Renders that item name to the screen
         guiGraphics.drawString(font, itemName, x + 20, y, 0xFFFFFF);
     }
-
     /**
      * method that gets executed when a mouse click event occurs.
      */

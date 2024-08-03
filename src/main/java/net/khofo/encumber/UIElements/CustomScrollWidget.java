@@ -1,5 +1,6 @@
 package net.khofo.encumber.UIElements;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractScrollWidget;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
@@ -10,6 +11,8 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static net.khofo.encumber.UIElements.BaseItemUI.isMouseOverItemName;
 
 
 @OnlyIn(Dist.CLIENT)
@@ -81,7 +84,7 @@ public class CustomScrollWidget extends AbstractScrollWidget {
         //System.out.println("Y: " + y);
         //System.out.println("Scroll Amount: " + this.scrollAmount());
         for (DropdownMenu menu : dropdownMenus) {
-            y = menu.render(this.getX(), y, this.getX() + 165, 20, pGuiGraphics, scrollAmount);
+            y = menu.render(this.getX(), y, this.getX() + 165, 20, pGuiGraphics, scrollAmount,pMouseX,pMouseY);
             // if Attempted render Y is less than topY, don't render it
             // if Attempted render Y is greater than bottomY don't render it
 
@@ -102,7 +105,7 @@ public class CustomScrollWidget extends AbstractScrollWidget {
         }
 
         for (BaseItem item : baseItems) {
-            y = BaseItemUI.renderBaseItem(item, this.getX(), y, this.getX() + 165, pGuiGraphics);
+            y = BaseItemUI.renderBaseItem(item, this.getX(), y, this.getX() + 165, pGuiGraphics,pMouseX,pMouseY,this.scrollAmount);
         }
     }
 
@@ -218,7 +221,7 @@ public class CustomScrollWidget extends AbstractScrollWidget {
             this.renderContents(pGuiGraphics, pMouseX, pMouseY, pPartialTick);
             pGuiGraphics.pose().popPose();
             pGuiGraphics.disableScissor();
-            this.renderDecorations(pGuiGraphics);
+            this.renderDecorations(pGuiGraphics,pMouseX,pMouseY);
         }
     }
 
@@ -226,11 +229,22 @@ public class CustomScrollWidget extends AbstractScrollWidget {
         return Mth.clamp((int)((float)(this.height * this.height) / (float)this.getInnerHeight()), 32, this.height);
     }
 
-    protected void renderDecorations(GuiGraphics pGuiGraphics) {
+    protected void renderDecorations(GuiGraphics pGuiGraphics,int pMouseX, int pMouseY) {
         if (this.scrollbarVisible()) {
             this.renderScrollBar1(pGuiGraphics);
         }
+        // Render Tooltip here instead of from my BaseItemUI's class since BaseItem is rendered inside renderContents() which happens while scissor is enabled
+        int yOffset = this.getY(); // Initialize yOffset with the starting Y coordinate of the widget
+        for (BaseItem item : baseItems) {
+            if (isMouseOverItemName(this.getX() + 20, yOffset - (int)this.scrollAmount() * 2 + 5, Minecraft.getInstance().font, item, pMouseX, pMouseY, 0)) {
+                String itemName = item.getName();
+                double screenMouseX = Minecraft.getInstance().mouseHandler.xpos() * (Minecraft.getInstance().getWindow().getGuiScaledWidth() / (double)Minecraft.getInstance().getWindow().getScreenWidth());
+                double screenMouseY = Minecraft.getInstance().mouseHandler.ypos() * (Minecraft.getInstance().getWindow().getGuiScaledHeight() / (double)Minecraft.getInstance().getWindow().getScreenHeight());
 
+                pGuiGraphics.renderTooltip(Minecraft.getInstance().font, Component.literal(itemName), (int)screenMouseX, (int)screenMouseY);
+            }
+            yOffset += 20; // Adjust the offset for the next item
+        }
     }
 
     protected double scrollAmount() {
