@@ -1,5 +1,6 @@
 package net.khofo.encumber.UIElements;
 
+import net.khofo.encumber.Encumber;
 import net.minecraft.SharedConstants;
 import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
@@ -16,12 +17,14 @@ import net.minecraft.client.sounds.SoundManager;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.Style;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.util.Mth;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
 import javax.annotation.Nullable;
+import java.util.Map;
 import java.util.Objects;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
@@ -326,6 +329,7 @@ public class CustomEditBox extends EditBox {
                         if (this.isEditable) {
                             this.shiftPressed = false;
                             this.deleteText(-1);
+                            updateWeight();
                             this.shiftPressed = Screen.hasShiftDown();
                         }
 
@@ -346,6 +350,7 @@ public class CustomEditBox extends EditBox {
 
                         return true;
                     case 262:
+                        System.out.println("Pressed Right Key");
                         if (Screen.hasControlDown()) {
                             this.moveCursorTo(this.getWordPosition(1));
                         } else {
@@ -354,6 +359,7 @@ public class CustomEditBox extends EditBox {
 
                         return true;
                     case 263:
+                        System.out.println("Pressed Left Key");
                         if (Screen.hasControlDown()) {
                             this.moveCursorTo(this.getWordPosition(-1));
                         } else {
@@ -368,6 +374,30 @@ public class CustomEditBox extends EditBox {
                         this.moveCursorToEnd();
                         return true;
                 }
+            }
+        }
+    }
+
+    private void updateWeight() {
+        // Retrieve the BaseItem associated with this CustomEditBox
+        BaseItem associatedItem = null;
+        for (Map.Entry<BaseItem, CustomEditBox> entry : BaseItemUI.editBoxMap.entrySet()) {
+            if (entry.getValue() == this) {
+                associatedItem = entry.getKey();
+                break;
+            }
+        }
+
+        if (associatedItem != null) {
+            String value = this.getValue();
+            try {
+                double newWeight = Double.parseDouble(value);
+                associatedItem.setWeight(newWeight);
+                ResourceLocation itemName = new ResourceLocation(associatedItem.getName());
+                Encumber.itemWeights.put(itemName, newWeight);
+                Encumber.updateConfigWeights();
+            } catch (NumberFormatException e) {
+                System.out.println("Invalid number format: " + value);
             }
         }
     }

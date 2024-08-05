@@ -10,13 +10,10 @@ import net.minecraft.client.gui.components.Button;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import org.lwjgl.glfw.GLFW;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
-
-@OnlyIn(Dist.CLIENT)
 public class WeightEditScreen extends Screen {
     private CustomScrollWidget customScrollWidget;
 
@@ -50,7 +47,8 @@ public class WeightEditScreen extends Screen {
         }
 
         // Initialize the search box
-        searchBox = new EditBox(this.font, this.width / 2 - 100, 2, 200, 16, Component.literal("Search"));
+        searchBox = new EditBox(this.font, this.width / 2 - 99, 2, 198, 16, Component.literal("Search"));
+        searchBox.setMaxLength(1028);
         searchBox.setResponder(this::onSearchChanged);
         this.addRenderableWidget(searchBox);
 
@@ -70,21 +68,72 @@ public class WeightEditScreen extends Screen {
     private void onSearchChanged(String searchQuery) {
         filteredItems.clear();
         customScrollWidget.clear();
+
         if (searchQuery.isEmpty()) {
             for (Group modGroup : modGroups) {
                 DropdownMenu dropdownMenu = new DropdownMenu(modGroup);
                 customScrollWidget.addDropdownMenu(dropdownMenu);
             }
         } else {
-            for (BaseItem item : allItems) {
-                if (item.getName().toLowerCase().contains(searchQuery.toLowerCase())) {
-                    filteredItems.add(item);
-                    customScrollWidget.addBaseItem(item);
+            Set<BaseItem> includedItems = new HashSet<>();
+
+            String[] parts = searchQuery.split("\\|");
+
+            for (String part : parts) {
+                part = part.trim();
+                boolean isModSpecific = part.startsWith("@");
+                String query = isModSpecific ? part.substring(1).trim() : part;
+
+                // Split the part into inclusion and exclusion terms
+                List<String> includeTerms = new ArrayList<>();
+                List<String> excludeTerms = new ArrayList<>();
+
+                for (String subQuery : query.split(" ")) {
+                    if (subQuery.startsWith("-")) {
+                        excludeTerms.add(subQuery.substring(1).toLowerCase());
+                    } else {
+                        includeTerms.add(subQuery.toLowerCase());
+                    }
                 }
+
+                for (BaseItem item : allItems) {
+                    String itemName = item.getName().toLowerCase();
+                    String modName = getModNameFromRegistryName(itemName);
+
+                    boolean matchesInclude = includeTerms.isEmpty() || includeTerms.stream().allMatch(itemName::contains);
+                    boolean matchesExclude = excludeTerms.stream().anyMatch(itemName::contains);
+
+                    if (isModSpecific) {
+                        String modQuery = includeTerms.isEmpty() ? "" : includeTerms.get(0); // First term is the mod name
+                        String itemQuery = includeTerms.size() > 1 ? String.join(" ", includeTerms.subList(1, includeTerms.size())) : "";
+
+                        if (modName.contains(modQuery) && itemName.contains(itemQuery) && !matchesExclude) {
+                            includedItems.add(item);
+                        }
+                    } else {
+                        if (matchesInclude && !matchesExclude) {
+                            includedItems.add(item);
+                        }
+                    }
+                }
+            }
+
+            filteredItems.addAll(includedItems);
+            for (BaseItem item : includedItems) {
+                customScrollWidget.addBaseItem(item);
             }
         }
     }
 
+
+    private String getModNameFromRegistryName(String registryName) {
+        // Assuming the registry name is in the format "modid:itemname"
+        int colonIndex = registryName.indexOf(':');
+        if (colonIndex > 0) {
+            return registryName.substring(0, colonIndex);
+        }
+        return "";
+    }
     @Override
     public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
         this.renderBackground(guiGraphics);
@@ -135,11 +184,25 @@ public class WeightEditScreen extends Screen {
 
     @Override
     public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
-        if (searchBox.keyPressed(keyCode, scanCode, modifiers)) {
-            return true;
-        }
-        if (customScrollWidget.keyPressed(keyCode, scanCode, modifiers)) {
-            return true;
+        if (searchBox.isFocused()) {
+            if (keyCode == GLFW.GLFW_KEY_TAB) {
+                searchBox.setFocused(false);
+                //customScrollWidget.focusNext();
+                return true;
+            }
+            if (searchBox.keyPressed(keyCode, scanCode, modifiers)) {
+                return true;
+            }
+        } else {
+            for (BaseItem item : filteredItems) {
+                CustomEditBox weightField = BaseItemUI.editBoxMap.get(item);
+                if (weightField != null && weightField.isFocused() && weightField.keyPressed(keyCode, scanCode, modifiers)) {
+                    return true;
+                }
+            }
+            if (customScrollWidget.keyPressed(keyCode, scanCode, modifiers)) {
+                return true;
+            }
         }
         return super.keyPressed(keyCode, scanCode, modifiers);
     }

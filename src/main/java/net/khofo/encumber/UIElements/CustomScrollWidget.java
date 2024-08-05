@@ -6,6 +6,7 @@ import net.minecraft.client.gui.components.AbstractScrollWidget;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.Mth;
+import net.minecraft.world.item.TooltipFlag;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
@@ -186,8 +187,8 @@ public class CustomScrollWidget extends AbstractScrollWidget {
 
     @Override
     public boolean keyPressed(int pKeyCode, int pScanCode, int pModifiers) {
-        boolean flag = pKeyCode == 265;
-        boolean flag1 = pKeyCode == 264;
+        boolean flag = pKeyCode == 265; // Up arrow
+        boolean flag1 = pKeyCode == 264; // Down arrow
         if (flag || flag1) {
             double d0 = this.scrollAmount;
             this.setScrollAmount(this.scrollAmount + (double) (flag ? -1 : 1) * this.scrollRate());
@@ -237,11 +238,9 @@ public class CustomScrollWidget extends AbstractScrollWidget {
         int yOffset = this.getY(); // Initialize yOffset with the starting Y coordinate of the widget
         for (BaseItem item : baseItems) {
             if (isMouseOverItemName(this.getX() + 20, yOffset - (int)this.scrollAmount() * 2 + 5, Minecraft.getInstance().font, item, pMouseX, pMouseY, 0)) {
-                String itemName = item.getName();
                 double screenMouseX = Minecraft.getInstance().mouseHandler.xpos() * (Minecraft.getInstance().getWindow().getGuiScaledWidth() / (double)Minecraft.getInstance().getWindow().getScreenWidth());
                 double screenMouseY = Minecraft.getInstance().mouseHandler.ypos() * (Minecraft.getInstance().getWindow().getGuiScaledHeight() / (double)Minecraft.getInstance().getWindow().getScreenHeight());
-
-                pGuiGraphics.renderTooltip(Minecraft.getInstance().font, Component.literal(itemName), (int)screenMouseX, (int)screenMouseY);
+                pGuiGraphics.renderTooltip(Minecraft.getInstance().font, item.getItemStack(), (int)screenMouseX,(int) screenMouseY);
             }
             yOffset += 20; // Adjust the offset for the next item
         }

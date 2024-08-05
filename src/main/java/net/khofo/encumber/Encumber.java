@@ -8,7 +8,7 @@ import net.khofo.encumber.commands.WeightCommands;
 import net.khofo.encumber.configs.ClientConfigs;
 import net.khofo.encumber.configs.CommonConfigs;
 import net.khofo.encumber.enchantment.UnencumbermentEnchant;
-import net.khofo.encumber.events.ClientEventHandler;
+import net.khofo.encumber.client.events.ClientEventHandler;
 import net.khofo.encumber.events.TooltipEvent;
 import net.khofo.encumber.events.WeightEvent;
 import net.khofo.encumber.UIElements.WeightOverlay;
@@ -21,6 +21,7 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.config.ModConfig;
@@ -52,6 +53,7 @@ public class Encumber {
     private static final Map<String, Double> defaultCategoryWeights = new HashMap<>();
     private static final Logger LOGGER = LogUtils.getLogger();
 
+
     static {
         defaultCategoryWeights.put("weapons", 2.0);
         defaultCategoryWeights.put("armor", 12.0);
@@ -68,8 +70,12 @@ public class Encumber {
         MinecraftForge.EVENT_BUS.register(this);
         ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, CommonConfigs.SPEC, "encumber-common.toml");
         ModLoadingContext.get().registerConfig(ModConfig.Type.CLIENT, ClientConfigs.CLIENT_SPEC, "encumber-client.toml");
-        MinecraftForge.EVENT_BUS.register(ClientEventHandler.KeyInputHandler.class);
         ENCHANTMENTS.register(FMLJavaModLoadingContext.get().getModEventBus());
+
+        DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> {
+            MinecraftForge.EVENT_BUS.register(ClientEventHandler.class);
+            MinecraftForge.EVENT_BUS.register(ClientEventHandler.KeyInputHandler.class);
+        });
     }
 
     private void commonSetup(final FMLCommonSetupEvent event) {

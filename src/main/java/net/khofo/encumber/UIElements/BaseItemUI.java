@@ -9,6 +9,7 @@ import net.minecraft.network.chat.FormattedText;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import org.lwjgl.glfw.GLFW;
 
 
 import java.util.HashMap;
@@ -20,7 +21,7 @@ public class BaseItemUI {
      * editBoxMap: a map of item's to edit boxes. Creates a link to the physical Box UI element to the BaseItem
      * font: vanilla minecraft font
      */
-    private static final Map<BaseItem, CustomEditBox> editBoxMap = new HashMap<>();
+    public static final Map<BaseItem, CustomEditBox> editBoxMap = new HashMap<>();
     private static final Font font = Minecraft.getInstance().font;
 
     /**
@@ -165,7 +166,7 @@ public class BaseItemUI {
     public static boolean keyPressed(BaseItem item, int keyCode, int scanCode, int modifiers) {
         // Grab the edit box
         CustomEditBox weightField = editBoxMap.get(item);
-        if (weightField != null && weightField.isFocused()) {
+        if (weightField != null && weightField.isFocused() && (keyCode == GLFW.GLFW_KEY_BACKSPACE || keyCode == GLFW.GLFW_KEY_DELETE)) {
             // If the edit box is clicked on, and a key is pressed, call editbox's key pressed method
             return weightField.keyPressed(keyCode, scanCode, modifiers);
         }
