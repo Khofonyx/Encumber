@@ -14,8 +14,6 @@ import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.RandomSource;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.event.RenderGuiOverlayEvent;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -23,7 +21,6 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 
-@OnlyIn(Dist.CLIENT)
 public class WeightOverlay {
     private static final ResourceLocation ANVIL_ICON_WHITE = new ResourceLocation(Encumber.MOD_ID, "textures/gui/anvil_icon_white.png");
     private static final ResourceLocation ANVIL_ICON_YELLOW = new ResourceLocation(Encumber.MOD_ID, "textures/gui/anvil_icon_yellow.png");

@@ -75,7 +75,7 @@ public class Group implements GroupItem {
     /**
      * Method to set the expanded boolean
      */
-    private void setExpanded(boolean expanded) {
+    public void setExpanded(boolean expanded) {
         this.expanded = expanded;
     }
 

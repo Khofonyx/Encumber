@@ -8,7 +8,7 @@ import net.khofo.encumber.commands.WeightCommands;
 import net.khofo.encumber.configs.ClientConfigs;
 import net.khofo.encumber.configs.CommonConfigs;
 import net.khofo.encumber.enchantment.UnencumbermentEnchant;
-import net.khofo.encumber.client.events.ClientEventHandler;
+import net.khofo.encumber.events.ClientEventHandler;
 import net.khofo.encumber.events.TooltipEvent;
 import net.khofo.encumber.events.WeightEvent;
 import net.khofo.encumber.UIElements.WeightOverlay;

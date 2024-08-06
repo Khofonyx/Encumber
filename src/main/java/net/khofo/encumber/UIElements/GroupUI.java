@@ -8,13 +8,10 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
 
 import java.util.HashMap;
 import java.util.Map;
 
-@OnlyIn(Dist.CLIENT)
 public class GroupUI {
     private static final Map<Group, CustomEditBox> editBoxMap = new HashMap<>();
     public static int renderGroup(Group group, int x, int y, int weightX, int indent, GuiGraphics guiGraphics, double scrollAmount,int mouseX,int mouseY) {
@@ -26,8 +23,8 @@ public class GroupUI {
         guiGraphics.drawString(font, group.getName(), x + 5, y + 5, 0xFFFFFF);
 
         CustomEditBox weightField = editBoxMap.computeIfAbsent(group, g -> {
-            CustomEditBox eb = new CustomEditBox(font, weightX - 3, y, 50, 19, Component.literal(""));
-            eb.setValue(String.format("%.4f", g.getWeight()));
+            CustomEditBox eb = new CustomEditBox(font, weightX, y, 37, 19, Component.literal(""));
+            eb.setValue(String.format("%.3f", g.getWeight()));
             return eb;
         });
 

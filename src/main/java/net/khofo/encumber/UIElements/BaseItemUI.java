@@ -37,8 +37,8 @@ public class BaseItemUI {
 
         // This creates a custom edit box for the item
         CustomEditBox weightField = editBoxMap.computeIfAbsent(item, i -> {
-            CustomEditBox eb = new CustomEditBox(font, weightX - 3, y, 50, 19, Component.literal(""));
-            eb.setValue(String.format("%.4f", i.getWeight()));
+            CustomEditBox eb = new CustomEditBox(font, weightX, y, 37, 19, Component.literal(""));
+            eb.setValue( ""+ i.getWeight());
             return eb;
         });
 

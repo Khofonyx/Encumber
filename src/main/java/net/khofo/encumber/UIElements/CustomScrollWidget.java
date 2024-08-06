@@ -6,7 +6,6 @@ import net.minecraft.client.gui.components.AbstractScrollWidget;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.Mth;
-import net.minecraft.world.item.TooltipFlag;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
@@ -23,6 +22,8 @@ public class CustomScrollWidget extends AbstractScrollWidget {
      * scrolling: whether or not you are scrolling.
      * dropdownMenu's: a list of dropdowns present in the scroll widget
      */
+
+    private boolean searchActive = false;
     private double scrollAmount;
     private boolean scrolling;
     private final List<DropdownMenu> dropdownMenus;
@@ -55,6 +56,10 @@ public class CustomScrollWidget extends AbstractScrollWidget {
         baseItems.clear();
     }
 
+    public void setSearchActive(boolean active) {
+        searchActive = active;
+    }
+
 
     /**
      * method to
@@ -79,34 +84,15 @@ public class CustomScrollWidget extends AbstractScrollWidget {
 
     @Override
     protected void renderContents(GuiGraphics pGuiGraphics, int pMouseX, int pMouseY, float pPartialTick) {
-        int yTop = this.getY();
-        int yBottom = this.getY() + this.height;
-        int y = this.getY() - (int) this.scrollAmount(); // Adjust starting Y position based on scroll amount
-        //System.out.println("Y: " + y);
-        //System.out.println("Scroll Amount: " + this.scrollAmount());
-        for (DropdownMenu menu : dropdownMenus) {
-            y = menu.render(this.getX(), y, this.getX() + 165, 20, pGuiGraphics, scrollAmount,pMouseX,pMouseY);
-            // if Attempted render Y is less than topY, don't render it
-            // if Attempted render Y is greater than bottomY don't render it
-
-
-            /*
-            ====================================== Y is the problem ============================
-             */
-
-
-            //System.out.println("Y: " + y);
-            //System.out.println("TopY: " + yTop);
-            //System.out.println("BottomY: " + yBottom);
-            //if (y < yTop && y > yBottom){
-                //System.out.println("NOT RENDERING BC OUT OF BOUNDS");
-           // }else{
-            //y = menu.render(this.getX(), y, this.getX() + 165, 20, pGuiGraphics, scrollAmount);
-            //}
-        }
-
-        for (BaseItem item : baseItems) {
-            y = BaseItemUI.renderBaseItem(item, this.getX(), y, this.getX() + 165, pGuiGraphics,pMouseX,pMouseY,this.scrollAmount);
+        int y = this.getY() - (int) this.scrollAmount();
+        if(searchActive){
+            for (BaseItem item : baseItems) {
+                y = BaseItemUI.renderBaseItem(item, this.getX(), y, this.getX() + 165, pGuiGraphics,pMouseX,pMouseY,this.scrollAmount);
+            }
+        }else{
+            for (DropdownMenu menu : dropdownMenus) {
+                y = menu.render(this.getX(), y, this.getX() + 165, 20, pGuiGraphics, scrollAmount,pMouseX,pMouseY);
+            }
         }
     }
 

@@ -1,4 +1,4 @@
-package net.khofo.encumber.client.events;
+package net.khofo.encumber.events;
 
 import net.khofo.encumber.UIElements.WeightEditScreen;
 import net.khofo.encumber.configs.CommonConfigs;
