@@ -1,10 +1,12 @@
 package net.khofo.encumber.UIElements;
 
+import net.khofo.encumber.Encumber;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractScrollWidget;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -72,8 +74,8 @@ public class CustomScrollWidget extends AbstractScrollWidget {
         }
         /* =======================================================BLACK MAGIC =====================================================
          I DON'T KNOW WHY I HAVE TO ADD THIS.HEIGHT AND DIVIDE BY 2 BUT IT WORKS */
-        height += baseItems.size() * 20;
-        return (height + this.height  + 20)/2;
+        height += baseItems.size() * 22;
+        return (height + this.height  + 22)/2;
     }
 
 
@@ -85,13 +87,19 @@ public class CustomScrollWidget extends AbstractScrollWidget {
     @Override
     protected void renderContents(GuiGraphics pGuiGraphics, int pMouseX, int pMouseY, float pPartialTick) {
         int y = this.getY() - (int) this.scrollAmount();
-        if(searchActive){
+        if (searchActive) {
             for (BaseItem item : baseItems) {
-                y = BaseItemUI.renderBaseItem(item, this.getX(), y, this.getX() + 165, pGuiGraphics,pMouseX,pMouseY,this.scrollAmount);
+                y = BaseItemUI.renderBaseItem(item, this.getX() + 18, y, this.getX() + 182, pGuiGraphics, pMouseX, pMouseY, this.scrollAmount);
             }
-        }else{
+        } else {
+            boolean isFirstMenu = true;
             for (DropdownMenu menu : dropdownMenus) {
-                y = menu.render(this.getX(), y, this.getX() + 165, 20, pGuiGraphics, scrollAmount,pMouseX,pMouseY);
+                if (isFirstMenu) {
+                    y = menu.render(this.getX() + 18, y + 1, this.getX() + 182, 20, pGuiGraphics, scrollAmount, pMouseX, pMouseY);
+                    isFirstMenu = false;
+                } else {
+                    y = menu.render(this.getX() + 18, y + 2, this.getX() + 182, 20, pGuiGraphics, scrollAmount, pMouseX, pMouseY);
+                }
             }
         }
     }
@@ -99,8 +107,8 @@ public class CustomScrollWidget extends AbstractScrollWidget {
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
         if (button == 0) {
-            int scrollbarXStart = this.getX() + this.getWidth();
-            int scrollbarXEnd = scrollbarXStart + 6;
+            int scrollbarXStart = this.getX() + this.getWidth()-20;
+            int scrollbarXEnd = scrollbarXStart + 8;
             int scrollbarYStart = this.getY() + (int) (this.scrollAmount * (this.height - this.getScrollBarHeight()) / this.getMaxScrollAmount());
             int scrollbarYEnd = scrollbarYStart + this.getScrollBarHeight();
 
@@ -113,23 +121,33 @@ public class CustomScrollWidget extends AbstractScrollWidget {
         int y = this.getY() - (int) this.scrollAmount(); // Adjust starting Y position based on scroll amount
         int indent = 0;
 
+        boolean isFirstGroup = true;
         for (DropdownMenu menu : dropdownMenus) {
             Group group = menu.getGroup();
             if (GroupUI.mouseClicked(group, mouseX, mouseY, button, this.scrollAmount())) {
                 return true;
             }
 
-            if (menu.mouseClicked(mouseX, mouseY, this.getX(), y, indent, this.scrollAmount())) {
-                return true;
+            // Adjust mouseY based on whether it is the first group or not
+            if (isFirstGroup) {
+                if (menu.mouseClicked(mouseX, mouseY, this.getX() + 18, y, indent, this.scrollAmount())) {
+                    return true;
+                }
+                isFirstGroup = false;
+            } else {
+                if (menu.mouseClicked(mouseX, mouseY, this.getX() + 18, y + 1, indent, this.scrollAmount())) {
+                    return true;
+                }
             }
-            y += menu.calculateHeight();
+
+            y += menu.calculateHeight() + (isFirstGroup ? 1 : 2); // Adjust the y position incrementally
         }
 
         for (BaseItem item : baseItems) {
             if (BaseItemUI.mouseClicked(item, mouseX, mouseY, button, this.scrollAmount())) {
                 return true;
             }
-            y += 20; // Assuming each BaseItem row height is 20
+            y += 22; // Assuming each BaseItem row height is 22
         }
 
         return super.mouseClicked(mouseX, mouseY, button);
@@ -208,15 +226,25 @@ public class CustomScrollWidget extends AbstractScrollWidget {
             this.renderContents(pGuiGraphics, pMouseX, pMouseY, pPartialTick);
             pGuiGraphics.pose().popPose();
             pGuiGraphics.disableScissor();
-            this.renderDecorations(pGuiGraphics,pMouseX,pMouseY);
         }
     }
+
+
+    public void renderOnlyDecorations(GuiGraphics pGuiGraphics, int pMouseX, int pMouseY) {
+        if (this.visible) {
+            this.renderDecorations(pGuiGraphics, pMouseX, pMouseY);
+        }
+    }
+
 
     private int getScrollBarHeight() {
         return Mth.clamp((int)((float)(this.height * this.height) / (float)this.getInnerHeight()), 32, this.height);
     }
 
     protected void renderDecorations(GuiGraphics pGuiGraphics,int pMouseX, int pMouseY) {
+        ResourceLocation gui_frame_top = new ResourceLocation(Encumber.MOD_ID, "textures/gui/weight_gui_frame_top.png");
+        ResourceLocation gui_frame_extend = new ResourceLocation(Encumber.MOD_ID, "textures/gui/weight_gui_frame_extendable.png");
+        ResourceLocation gui_frame_bottom = new ResourceLocation(Encumber.MOD_ID, "textures/gui/weight_gui_frame_bottom.png");
         if (this.scrollbarVisible()) {
             this.renderScrollBar1(pGuiGraphics);
         }
@@ -228,15 +256,16 @@ public class CustomScrollWidget extends AbstractScrollWidget {
                 double screenMouseY = Minecraft.getInstance().mouseHandler.ypos() * (Minecraft.getInstance().getWindow().getGuiScaledHeight() / (double)Minecraft.getInstance().getWindow().getScreenHeight());
                 pGuiGraphics.renderTooltip(Minecraft.getInstance().font, item.getItemStack(), (int)screenMouseX,(int) screenMouseY);
             }
-            yOffset += 20; // Adjust the offset for the next item
+            yOffset += 22; // Adjust the offset for the next item
         }
+        pGuiGraphics.blit(gui_frame_top, this.getX(), this.getY()-41, 0, 0, 256,41,256,41);
+        pGuiGraphics.blit(gui_frame_extend, this.getX(), this.getY(), 0, 0, 256,this.height,256,this.height);
+        pGuiGraphics.blit(gui_frame_bottom, this.getX(), this.getY()+this.height-3, 0, 0, 256,39,256,39);
     }
 
     protected double scrollAmount() {
         return this.scrollAmount;
     }
-
-    //private double lastScrollAmount = -1;
 
     @Override
     public void setScrollAmount(double scrollAmount) {
@@ -253,19 +282,31 @@ public class CustomScrollWidget extends AbstractScrollWidget {
     }
 
     protected void renderBorder(GuiGraphics pGuiGraphics, int pX, int pY, int pWidth, int pHeight) {
-        int i = this.isFocused() ? -1 : -6250336;
-        pGuiGraphics.fill(pX, pY, pX + pWidth, pY + pHeight, i);
-        pGuiGraphics.fill(pX + 1, pY + 1, pX + pWidth - 1, pY + pHeight - 1, -16777216);
+        pGuiGraphics.fill(pX, pY-27, pX + pWidth - 1, pY + pHeight+10, -16777216);
     }
 
     private void renderScrollBar1(GuiGraphics pGuiGraphics) {
-        int i = this.getScrollBarHeight();
-        int j = this.getX() + this.width;
-        int k = this.getX() + this.width + 8;
-        int l = Math.max(this.getY(), (int)this.scrollAmount * (this.height - i) / this.getMaxScrollAmount() + this.getY());
-        int i1 = l + i;
-        pGuiGraphics.fill(j, l, k, i1, -8355712);
-        pGuiGraphics.fill(j, l, k - 1, i1 - 1, -4144960);
+        int scrollBarHeight = this.getScrollBarHeight();
+        int scrollBarXStart = this.getX() + this.width - 20;
+        int scrollBarYStart = Math.max(this.getY(), (int) this.scrollAmount * (this.height - scrollBarHeight) / this.getMaxScrollAmount() + this.getY());
+
+        ResourceLocation scroll_bar_top = new ResourceLocation("encumber", "textures/gui/scroll_bar_top.png");
+        ResourceLocation scroll_bar_middle = new ResourceLocation("encumber", "textures/gui/scroll_bar_middle.png");
+        ResourceLocation scroll_bar_bottom = new ResourceLocation("encumber", "textures/gui/scroll_bar_bottom.png");
+
+        int topHeight = 2; // Assuming the top part is 2 pixels high
+        int bottomHeight = 2; // Assuming the bottom part is 2 pixels high
+
+        // Render top part of the scrollbar
+        pGuiGraphics.blit(scroll_bar_top, scrollBarXStart, scrollBarYStart-5, 0, 0, 8, topHeight,8,topHeight);
+
+        // Render middle part of the scrollbar, resized to fill the space between top and bottom
+        int middleHeight = scrollBarHeight - topHeight - bottomHeight;
+        if (middleHeight > 0) {
+            pGuiGraphics.blit(scroll_bar_middle, scrollBarXStart, scrollBarYStart + topHeight -5, 0, 0, 8, middleHeight,8,middleHeight);
+        }
+        // Render bottom part of the scrollbar
+        pGuiGraphics.blit(scroll_bar_bottom, scrollBarXStart, scrollBarYStart + scrollBarHeight - bottomHeight - 5, 0, 0, 8, bottomHeight,8,bottomHeight);
     }
 
     protected boolean scrollbarVisible() {

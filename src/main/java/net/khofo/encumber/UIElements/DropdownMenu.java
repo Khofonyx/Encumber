@@ -40,7 +40,7 @@ public class DropdownMenu {
      */
     public boolean mouseClicked(double mouseX, double mouseY, int x, int y, int indent, double scrollAmount) {
         // The height of each row whether that be a BaseItem or another group is by default 20
-        int rowHeight = 20;
+        int rowHeight = 22;
 
         // This is the x dimension of the dropdown menu's clickable region.
         // We start at 160 by default, and every indent we subtract the indent about.
@@ -65,7 +65,7 @@ public class DropdownMenu {
                     }
                     currentY += childMenu.calculateHeight();
                 } else {
-                    currentY += 20;
+                    currentY += 22;
                 }
             }
         }
@@ -81,7 +81,7 @@ public class DropdownMenu {
      */
     public int calculateHeight() {
         // Again, height is default 20 pixels.
-        int height = 20;
+        int height = 22;
 
         // If our group is expanded, we iterate through each child element adding 20 for every element.
         if (group.isExpanded()) {
@@ -92,7 +92,7 @@ public class DropdownMenu {
                     height += childHeight;
                 } else {
                     // If the child is not a group, implying that it is a BaseItem, we just add 20 since a base item row is just 20 pixels tall.
-                    height += 20;
+                    height += 22;
                 }
             }
         }

@@ -30,21 +30,20 @@ public class BaseItemUI {
      */
     public static int renderBaseItem(BaseItem item, int x, int y, int weightX, GuiGraphics guiGraphics, int mouseX, int mouseY,double scrollAmount) {
         // This renders the item name
-        renderItemName(guiGraphics,font,item,x,y+5);
+        renderItemName(guiGraphics,font,item,x,y+6);
 
         // This renders the item's image from the item stack
-        guiGraphics.renderItem(item.getItemStack(),x,y);
+        guiGraphics.renderItem(item.getItemStack(),x,y+2);
 
         // This creates a custom edit box for the item
         CustomEditBox weightField = editBoxMap.computeIfAbsent(item, i -> {
-            CustomEditBox eb = new CustomEditBox(font, weightX, y, 37, 19, Component.literal(""));
+            CustomEditBox eb = new CustomEditBox(font, weightX, y, 37, 16, Component.literal(""));
             eb.setValue( ""+ i.getWeight());
             return eb;
         });
 
-        // These set the position of the edit box
         weightField.setX(weightX - 3);
-        weightField.setY(y);
+        weightField.setY(y+3);
 
         // This allows the box to be editable initially
         weightField.setEditable(true);
@@ -52,7 +51,7 @@ public class BaseItemUI {
         // This renders the edit box to the screen
         weightField.renderWidget(guiGraphics, 0, 0, 0);
 
-        return y + 20;
+        return y + 22;
     }
 
     public static boolean isMouseOverItemName(int x, int y, Font font, BaseItem item, int mouseX, int mouseY,double scrollAmount) {

@@ -17,23 +17,22 @@ public class GroupUI {
     public static int renderGroup(Group group, int x, int y, int weightX, int indent, GuiGraphics guiGraphics, double scrollAmount,int mouseX,int mouseY) {
         Font font = Minecraft.getInstance().font;
 
-        drawHitbox(guiGraphics, x, y, 200 - indent - 2, 18, 0x55808080);
-        drawHitbox(guiGraphics, x, y, 200 - indent, 20, 0x55AAAAAA);
-
-        guiGraphics.drawString(font, group.getName(), x + 5, y + 5, 0xFFFFFF);
-
         CustomEditBox weightField = editBoxMap.computeIfAbsent(group, g -> {
-            CustomEditBox eb = new CustomEditBox(font, weightX, y, 37, 19, Component.literal(""));
-            eb.setValue(String.format("%.3f", g.getWeight()));
+            CustomEditBox eb = new CustomEditBox(font, weightX, y, 37, 16, Component.literal(""));
+            eb.setValue(""+g.getWeight());
             return eb;
         });
 
         weightField.setX(weightX - 3);
-        weightField.setY(y);
+        weightField.setY(y+3);
         weightField.setEditable(!group.isExpanded());
         weightField.renderWidget(guiGraphics, 0, 0, 0);
 
-        int currentY = y + 20;
+        drawHitbox(guiGraphics, x, y, 204, 22);
+
+        guiGraphics.drawString(font, group.getName(), x + 5, y +6, 0xFFFFFF);
+
+        int currentY = y + 22;
 
         if (group.isExpanded()) {
             for (GroupItem subGroup : group.getSubGroups()) {
@@ -48,13 +47,10 @@ public class GroupUI {
         return currentY;
     }
 
-    private static void drawHitbox(GuiGraphics guiGraphics, int x, int y, int width, int height, int color) {
-        RenderSystem.setShader(GameRenderer::getPositionColorShader);
-        RenderSystem.enableBlend();
-        RenderSystem.defaultBlendFunc();
-        RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
-        guiGraphics.fillGradient(x, y, x + width, y + height, color, color);
-        RenderSystem.disableBlend();
+    private static void drawHitbox(GuiGraphics guiGraphics, int x, int y, int width, int height) {
+        ResourceLocation group_box = new ResourceLocation(Encumber.MOD_ID, "textures/gui/weight_gui_group_and_edit_box.png");
+        guiGraphics.blit(group_box, x, y, 0, 0, width,height,width,height);
+
     }
 
     public static boolean mouseClicked(Group group, double mouseX, double mouseY, int button,double scrollAmount) {

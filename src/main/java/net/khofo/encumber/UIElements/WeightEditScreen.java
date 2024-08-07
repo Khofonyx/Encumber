@@ -40,7 +40,7 @@ public class WeightEditScreen extends Screen {
 
 
         // Initialize the CustomScrollWidget
-        customScrollWidget = new CustomScrollWidget(this.width / 2 - 100, 20, 200, this.height - 60, Component.literal("Scroll Widget"));
+        customScrollWidget = new CustomScrollWidget(this.width / 2 - 128, 60, 256, this.height - 120, Component.literal("Scroll Widget"));
 
 
         // Create a DropdownMenu for each mod group and add it to the CustomScrollWidget
@@ -50,7 +50,7 @@ public class WeightEditScreen extends Screen {
         }
 
         // Initialize the search box
-        searchBox = new EditBox(this.font, this.width / 2 - 99, 2, 159, 16, Component.literal("Search"));
+        searchBox = new EditBox(this.font, this.width / 2 - 107, customScrollWidget.getY() -29, 145, 16, Component.literal("Search"));
         searchBox.setMaxLength(1028);
         searchBox.setResponder(this::onSearchChanged);
         this.addRenderableWidget(searchBox);
@@ -64,16 +64,16 @@ public class WeightEditScreen extends Screen {
 
 
         // Add a button to the screen
-        this.addRenderableWidget(Button.builder(Component.literal("Done"), (button) -> {
+        this.addRenderableWidget(Button.builder(Component.literal("Exit"), (button) -> {
             this.minecraft.setScreen(null); // Close the screen
-        }).bounds(this.width / 2 - 100, this.height - 30, 200, 20).build());
+        }).bounds(this.width / 2 - 38, this.height - 52, 76, 18).build());
 
 
 
 
-        eBox = new CustomEditBox(font, this.width / 2 +62, 2, 37, 16, Component.literal(""));
+        eBox = new CustomEditBox(font, this.width / 2 +50, customScrollWidget.getY() -29, 41, 17, Component.literal(""));
         eBox.setEditable(true);
-        eBox.setValue(String.format("%.4f", previousEBoxValue));
+        eBox.setValue(""+previousEBoxValue);
         eBox.setResponder(this::onEBoxChanged);
 
         onSearchChanged(previousSearchQuery);
@@ -178,9 +178,10 @@ public class WeightEditScreen extends Screen {
     @Override
     public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
         this.renderBackground(guiGraphics);
-        customScrollWidget.render(guiGraphics, mouseX, mouseY, partialTicks);
         searchBox.render(guiGraphics, mouseX, mouseY, partialTicks);
-        eBox.renderWidget(guiGraphics,mouseX,mouseY,partialTicks);
+        customScrollWidget.renderWidget(guiGraphics, mouseX, mouseY, partialTicks);
+        eBox.renderWidget(guiGraphics, mouseX, mouseY, partialTicks);
+        customScrollWidget.renderOnlyDecorations(guiGraphics, mouseX, mouseY);
         super.render(guiGraphics, mouseX, mouseY, partialTicks);
     }
 
