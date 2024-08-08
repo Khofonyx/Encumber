@@ -204,6 +204,7 @@ public class CustomScrollWidget extends AbstractScrollWidget {
         for (DropdownMenu menu : dropdownMenus) {
             Group group = menu.getGroup();
             if (GroupUI.keyPressed(group, pKeyCode, pScanCode, pModifiers)) {
+                System.out.println("GroupUI KEYPRESSED");
                 return true;
             }
         }
@@ -251,7 +252,7 @@ public class CustomScrollWidget extends AbstractScrollWidget {
         // Render Tooltip here instead of from my BaseItemUI's class since BaseItem is rendered inside renderContents() which happens while scissor is enabled
         int yOffset = this.getY(); // Initialize yOffset with the starting Y coordinate of the widget
         for (BaseItem item : baseItems) {
-            if (isMouseOverItemName(this.getX() + 20, yOffset - (int)this.scrollAmount() * 2 + 5, Minecraft.getInstance().font, item, pMouseX, pMouseY, 0)) {
+            if (isMouseOverItemName(this.getX() + 38, yOffset - (int)this.scrollAmount() * 2 + 5, Minecraft.getInstance().font, item, pMouseX, pMouseY, 0)) {
                 double screenMouseX = Minecraft.getInstance().mouseHandler.xpos() * (Minecraft.getInstance().getWindow().getGuiScaledWidth() / (double)Minecraft.getInstance().getWindow().getScreenWidth());
                 double screenMouseY = Minecraft.getInstance().mouseHandler.ypos() * (Minecraft.getInstance().getWindow().getGuiScaledHeight() / (double)Minecraft.getInstance().getWindow().getScreenHeight());
                 pGuiGraphics.renderTooltip(Minecraft.getInstance().font, item.getItemStack(), (int)screenMouseX,(int) screenMouseY);
@@ -298,15 +299,15 @@ public class CustomScrollWidget extends AbstractScrollWidget {
         int bottomHeight = 2; // Assuming the bottom part is 2 pixels high
 
         // Render top part of the scrollbar
-        pGuiGraphics.blit(scroll_bar_top, scrollBarXStart, scrollBarYStart-5, 0, 0, 8, topHeight,8,topHeight);
+        pGuiGraphics.blit(scroll_bar_top, scrollBarXStart, scrollBarYStart, 0, 0, 8, topHeight,8,topHeight);
 
         // Render middle part of the scrollbar, resized to fill the space between top and bottom
         int middleHeight = scrollBarHeight - topHeight - bottomHeight;
         if (middleHeight > 0) {
-            pGuiGraphics.blit(scroll_bar_middle, scrollBarXStart, scrollBarYStart + topHeight -5, 0, 0, 8, middleHeight,8,middleHeight);
+            pGuiGraphics.blit(scroll_bar_middle, scrollBarXStart, scrollBarYStart + topHeight, 0, 0, 8, middleHeight,8,middleHeight);
         }
         // Render bottom part of the scrollbar
-        pGuiGraphics.blit(scroll_bar_bottom, scrollBarXStart, scrollBarYStart + scrollBarHeight - bottomHeight - 5, 0, 0, 8, bottomHeight,8,bottomHeight);
+        pGuiGraphics.blit(scroll_bar_bottom, scrollBarXStart, scrollBarYStart + scrollBarHeight - bottomHeight, 0, 0, 8, bottomHeight,8,bottomHeight);
     }
 
     protected boolean scrollbarVisible() {

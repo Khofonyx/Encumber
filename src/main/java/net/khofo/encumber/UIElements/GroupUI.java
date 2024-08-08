@@ -1,13 +1,12 @@
 package net.khofo.encumber.UIElements;
 
-import com.mojang.blaze3d.systems.RenderSystem;
 import net.khofo.encumber.Encumber;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import org.lwjgl.glfw.GLFW;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -23,12 +22,12 @@ public class GroupUI {
             return eb;
         });
 
-        weightField.setX(weightX - 3);
-        weightField.setY(y+3);
+        weightField.setX(weightX - 2);
+        weightField.setY(y+4);
         weightField.setEditable(!group.isExpanded());
         weightField.renderWidget(guiGraphics, 0, 0, 0);
 
-        drawHitbox(guiGraphics, x, y, 204, 22);
+        drawHitbox(guiGraphics, x, y, 204, 22,group);
 
         guiGraphics.drawString(font, group.getName(), x + 5, y +6, 0xFFFFFF);
 
@@ -39,7 +38,6 @@ public class GroupUI {
                 if (subGroup instanceof BaseItem) {
                     currentY = BaseItemUI.renderBaseItem((BaseItem) subGroup, x + indent, currentY, weightX, guiGraphics,mouseX,mouseY,scrollAmount);
                 } else if (subGroup instanceof Group) {
-                    int previousY = currentY;
                     currentY = renderGroup((Group) subGroup, x + indent, currentY, weightX, indent, guiGraphics, scrollAmount,mouseX,mouseY);
                 }
             }
@@ -47,10 +45,14 @@ public class GroupUI {
         return currentY;
     }
 
-    private static void drawHitbox(GuiGraphics guiGraphics, int x, int y, int width, int height) {
-        ResourceLocation group_box = new ResourceLocation(Encumber.MOD_ID, "textures/gui/weight_gui_group_and_edit_box.png");
-        guiGraphics.blit(group_box, x, y, 0, 0, width,height,width,height);
-
+    private static void drawHitbox(GuiGraphics guiGraphics, int x, int y, int width, int height,Group group) {
+        if(group.isExpanded()){
+            ResourceLocation group_box = new ResourceLocation(Encumber.MOD_ID, "textures/gui/weight_gui_group_and_edit_box_pressed.png");
+            guiGraphics.blit(group_box, x, y, 0, 0, width,height,width,height);
+        }else{
+            ResourceLocation group_box = new ResourceLocation(Encumber.MOD_ID, "textures/gui/weight_gui_group_and_edit_box.png");
+            guiGraphics.blit(group_box, x, y, 0, 0, width,height,width,height);
+        }
     }
 
     public static boolean mouseClicked(Group group, double mouseX, double mouseY, int button,double scrollAmount) {
@@ -164,8 +166,10 @@ public class GroupUI {
 
     public static boolean keyPressed(Group group, int keyCode, int scanCode, int modifiers) {
         CustomEditBox weightField = editBoxMap.get(group);
-        if (weightField != null && weightField.isFocused()) {
-            return weightField.keyPressed(keyCode, scanCode, modifiers);
+        if (weightField != null){
+            if ((weightField.isFocused() && keyCode == GLFW.GLFW_KEY_LEFT) || (weightField.isFocused() && keyCode == GLFW.GLFW_KEY_RIGHT) || (weightField.isFocused() && keyCode == GLFW.GLFW_KEY_BACKSPACE)) {
+                return weightField.keyPressed(keyCode, scanCode, modifiers);
+            }
         }
 
         if (group.isExpanded()) {
@@ -180,6 +184,8 @@ public class GroupUI {
                     }
                 }
             }
+        }else{
+
         }
         return false;
     }

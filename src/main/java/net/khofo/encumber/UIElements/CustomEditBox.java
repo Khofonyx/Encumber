@@ -22,6 +22,7 @@ import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.util.Mth;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import org.lwjgl.glfw.GLFW;
 
 import javax.annotation.Nullable;
 import java.util.Map;
@@ -298,6 +299,7 @@ public class CustomEditBox extends EditBox {
         this.moveCursorTo(this.value.length());
     }
 
+    @Override
     public boolean keyPressed(int pKeyCode, int pScanCode, int pModifiers) {
         if (!this.canConsumeInput()) {
             return false;
@@ -350,7 +352,6 @@ public class CustomEditBox extends EditBox {
 
                         return true;
                     case 262:
-                        System.out.println("Pressed Right Key");
                         if (Screen.hasControlDown()) {
                             this.moveCursorTo(this.getWordPosition(1));
                         } else {
@@ -359,7 +360,6 @@ public class CustomEditBox extends EditBox {
 
                         return true;
                     case 263:
-                        System.out.println("Pressed Left Key");
                         if (Screen.hasControlDown()) {
                             this.moveCursorTo(this.getWordPosition(-1));
                         } else {
@@ -439,9 +439,8 @@ public class CustomEditBox extends EditBox {
     public void renderWidget(GuiGraphics pGuiGraphics, int pMouseX, int pMouseY, float pPartialTick) {
         if (this.isVisible()) {
             if (this.isBordered()) {
-                int i = this.isFocused() ? -1 : -6250336;
-                pGuiGraphics.fill(this.getX() - 1, this.getY() - 1, this.getX() + this.width + 1, this.getY() + this.height + 1, i);
-                pGuiGraphics.fill(this.getX(), this.getY(), this.getX() + this.width, this.getY() + this.height, -16777216);
+                ResourceLocation edit_box_border = new ResourceLocation(Encumber.MOD_ID, "textures/gui/edit_box_border.png");
+                pGuiGraphics.blit(edit_box_border, this.getX(), this.getY(), 0, 0, 38,14,38,14);
             }
 
             int i2 = this.isEditable ? this.textColor : this.textColorUneditable;
@@ -450,8 +449,8 @@ public class CustomEditBox extends EditBox {
             String s = this.font.plainSubstrByWidth(this.value.substring(this.displayPos), this.getInnerWidth());
             boolean flag = j >= 0 && j <= s.length();
             boolean flag1 = this.shouldRenderCursor() && flag;
-            int l = this.bordered ? this.getX() + 4 : this.getX();
-            int i1 = this.bordered ? this.getY() + (this.height - 8) / 2 : this.getY();
+            int l = (this.bordered ? this.getX() + 4 : this.getX()) -1;
+            int i1 = (this.bordered ? this.getY() + (this.height - 8) / 2 : this.getY()) - 1;
             int j1 = l;
             if (k > s.length()) {
                 k = s.length();

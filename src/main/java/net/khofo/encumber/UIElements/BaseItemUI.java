@@ -42,7 +42,7 @@ public class BaseItemUI {
             return eb;
         });
 
-        weightField.setX(weightX - 3);
+        weightField.setX(weightX - 1);
         weightField.setY(y+3);
 
         // This allows the box to be editable initially
@@ -165,7 +165,7 @@ public class BaseItemUI {
     public static boolean keyPressed(BaseItem item, int keyCode, int scanCode, int modifiers) {
         // Grab the edit box
         CustomEditBox weightField = editBoxMap.get(item);
-        if (weightField != null && weightField.isFocused() && (keyCode == GLFW.GLFW_KEY_BACKSPACE || keyCode == GLFW.GLFW_KEY_DELETE)) {
+        if (weightField != null && weightField.isFocused()) {
             // If the edit box is clicked on, and a key is pressed, call editbox's key pressed method
             return weightField.keyPressed(keyCode, scanCode, modifiers);
         }

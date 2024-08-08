@@ -1,32 +1,30 @@
 package net.khofo.encumber.UIElements;
 
+import com.mojang.blaze3d.systems.RenderSystem;
 import net.khofo.encumber.Encumber;
 import net.khofo.encumber.groups.ItemGroups;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.EditBox;
+import net.minecraft.client.gui.components.Renderable;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.resources.ResourceLocation;
 import org.lwjgl.glfw.GLFW;
-
 import java.util.*;
 
 public class WeightEditScreen extends Screen {
     private String previousSearchQuery = "";
     private CustomScrollWidget customScrollWidget;
-
     private EditBox searchBox;
-
     private List<BaseItem> allItems;
     private List<BaseItem> filteredItems = new ArrayList<>();
-
     List<Group> modGroups;
-
     private double previousEBoxValue = 0.0;
-
     CustomEditBox eBox;
-
+    CustomButton exitButton;
+    CustomButton anvil_badge;
+    boolean confirm_weight;
     public WeightEditScreen(Component title) {
         super(title);
     }
@@ -62,38 +60,48 @@ public class WeightEditScreen extends Screen {
             allItems.add(new BaseItem(entry.getKey().toString(), entry.getValue()));
         }
 
-
-        // Add a button to the screen
-        this.addRenderableWidget(Button.builder(Component.literal("Exit"), (button) -> {
-            this.minecraft.setScreen(null); // Close the screen
-        }).bounds(this.width / 2 - 38, this.height - 52, 76, 18).build());
-
-
-
-
-        eBox = new CustomEditBox(font, this.width / 2 +50, customScrollWidget.getY() -29, 41, 17, Component.literal(""));
+        eBox = new CustomEditBox(font, this.width / 2 +52, customScrollWidget.getY() -28, 41, 17, Component.literal(""));
         eBox.setEditable(true);
         eBox.setValue(""+previousEBoxValue);
         eBox.setResponder(this::onEBoxChanged);
 
         onSearchChanged(previousSearchQuery);
+
+        exitButton = new CustomButton(this.width / 2 - 38,this.height - 52,76,18,Component.literal("Exit"),(button) -> {this.minecraft.setScreen(null);},"textures/gui/exit_button.png");
+        this.addRenderableWidget(exitButton);
+
+        anvil_badge = new CustomButton(this.width / 2 +102,customScrollWidget.getY() -28,14,14,Component.literal(""),(button) -> {
+            confirm_weight = true;
+            onEBoxChanged(eBox.getValue());
+            },"textures/gui/anvil_badge.png","Click To Confirm");
+        this.addRenderableWidget(anvil_badge);
+        anvil_badge.visible = false;
     }
 
     private void onEBoxChanged(String newValue) {
         try {
-            double newWeight = Double.parseDouble(newValue);
-            for (BaseItem item : filteredItems) {
-                item.setWeight(newWeight);
-                ResourceLocation itemName = new ResourceLocation(item.getName());
-                Encumber.itemWeights.put(itemName, newWeight);
-
-                CustomEditBox weightField = BaseItemUI.editBoxMap.get(item);
-                if (weightField != null) {
-                    weightField.setValue(newValue);  // Update the value in the edit box
-                }
+            if(searchBox.getValue().equals("")){
+                anvil_badge.visible = false;
+            }else{
+                anvil_badge.visible = true;
             }
-            Encumber.updateConfigWeights();
-            previousEBoxValue = newWeight;
+            if(confirm_weight){
+                double newWeight = Double.parseDouble(newValue);
+                for (BaseItem item : filteredItems) {
+                    item.setWeight(newWeight);
+                    ResourceLocation itemName = new ResourceLocation(item.getName());
+                    Encumber.itemWeights.put(itemName, newWeight);
+
+                    CustomEditBox weightField = BaseItemUI.editBoxMap.get(item);
+                    if (weightField != null) {
+                        weightField.setValue(newValue);  // Update the value in the edit box
+                    }
+                }
+                Encumber.updateConfigWeights();
+                previousEBoxValue = newWeight;
+                confirm_weight = false;
+                anvil_badge.visible = false;
+            }
         } catch (NumberFormatException e) {
             System.out.println("Invalid number format: " + newValue);
         }
@@ -103,7 +111,6 @@ public class WeightEditScreen extends Screen {
         if (!searchQuery.equals(previousSearchQuery)) {
             filteredItems.clear();
             customScrollWidget.clear();
-            eBox.setValue("");  // Clear the value of eBox whenever the search query changes
 
             if (searchQuery.isEmpty()) {
                 customScrollWidget.setSearchActive(false);
@@ -182,7 +189,15 @@ public class WeightEditScreen extends Screen {
         customScrollWidget.renderWidget(guiGraphics, mouseX, mouseY, partialTicks);
         eBox.renderWidget(guiGraphics, mouseX, mouseY, partialTicks);
         customScrollWidget.renderOnlyDecorations(guiGraphics, mouseX, mouseY);
-        super.render(guiGraphics, mouseX, mouseY, partialTicks);
+        exitButton.renderWidget(guiGraphics, mouseX, mouseY, partialTicks);
+        if(searchBox.getValue().equals("")){
+            anvil_badge.visible = false;
+        }
+        for (Renderable widget : this.renderables) {
+            if (widget != searchBox && widget != customScrollWidget && widget != eBox && widget != exitButton) {
+                widget.render(guiGraphics, mouseX, mouseY, partialTicks);
+            }
+        }
     }
 
     @Override
@@ -239,14 +254,15 @@ public class WeightEditScreen extends Screen {
         if (searchBox.isFocused()) {
             if (keyCode == GLFW.GLFW_KEY_TAB) {
                 searchBox.setFocused(false);
-                //customScrollWidget.focusNext();
                 return true;
             }
             if (searchBox.keyPressed(keyCode, scanCode, modifiers)) {
+                searchBox.setFocused(true);
                 return true;
             }
         } else if(eBox.isFocused()) {
             if(eBox.keyPressed(keyCode,scanCode,modifiers)){
+                eBox.setFocused(true);
                 return true;
             }
         }else {
